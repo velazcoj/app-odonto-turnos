@@ -1,11 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Cada usuario solo puede leer y escribir sus propios datos.
+    // Solo su cuenta lee y escribe, y solo dentro de su carpeta. Cualquier otra cuenta creada con la
+    // apiKey pública (que no es secreta) queda sin acceso.
+    // Si algún día se recrea su usuario en Authentication, el UID cambia y hay que actualizarlo acá.
+    function esElla(userId) {
+      return request.auth != null
+        && request.auth.uid == userId
+        && userId == '2PWS2Y4ntSYtNxGPK3pulkxr9AF3';
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if esElla(userId);
       match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if esElla(userId);
       }
     }
   }

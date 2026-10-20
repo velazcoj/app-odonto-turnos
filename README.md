@@ -30,4 +30,4 @@ Abrir el link en **Safari** → botón Compartir → **Agregar a pantalla de ini
 ## Datos
 
 `users/{uid}/patients/{id}` y `users/{uid}/appointments/{id}` (fecha `YYYY-MM-DD`, hora `HH:mm`, duración en minutos).
-Las reglas solo permiten que cada usuaria lea y escriba lo suyo.
+Las reglas solo permiten leer y escribir a su cuenta (UID fijo en `firestore.rules`): si se recrea el usuario, hay que actualizarlo ahí y volver a publicar las reglas.

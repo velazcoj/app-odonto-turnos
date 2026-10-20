@@ -6,7 +6,19 @@ const SEPARATORS = /\s*(?:[/,;]|\s[oóy]\s|\b(?:interno|int|ext)[.:]?(?=[\s\d]|$
 // Sin el texto de alrededor: "cel: +54…" → "+54…", "… después de las 20" / "… (18 hs)" → solo el número
 // (si no, esos dígitos se sumaban y podían armar el número válido de otra persona).
 const cleanPart = (p) => p.replace(/^[^\d+]+/, '').replace(/\s*\p{L}.*$/u, '').replace(/\s*\([^)]*$/, '');
-const parts = (phone) => String(phone || '').split(SEPARATORS).map(cleanPart).filter((p) => /\d/.test(p));
+function parts(phone) {
+  const pieces = String(phone || '').split(SEPARATORS).map(cleanPart).filter((p) => /\d/.test(p));
+  const out = [];
+  for (let i = 0; i < pieces.length; i++) {
+    let p = pieces[i];
+    // Una "/" dentro de un mismo número ("11/5555-0142", "4444/1234"): unir con lo que sigue si el
+    // pedazo es demasiado corto para ser un número, o si solo así queda un número válido.
+    const short = (x) => x.replace(/\D/g, '').length < 6;
+    while (!waOne(p) && i + 1 < pieces.length && (short(p) || waOne(`${p} ${pieces[i + 1]}`))) p += ` ${pieces[++i]}`;
+    out.push(p);
+  }
+  return out;
+}
 
 function waOne(s) {
   let d = s.replace(/\D/g, '');

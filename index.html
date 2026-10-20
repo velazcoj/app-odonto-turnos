@@ -12,10 +12,9 @@
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
     <link rel="icon" type="image/png" href="./icons/icon-192.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <!-- Outfit para la interfaz y Josefin Sans para el logotipo; sin conexión cae a la fuente del sistema. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600&family=Outfit:wght@400;500;600;700;800&display=swap" />
+    <!-- Outfit (interfaz) y Josefin Sans (logotipo) van dentro de la app: se ven igual sin señal. -->
+    <link rel="preload" href="./fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./fonts/fonts.css" />
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />

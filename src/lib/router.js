@@ -9,6 +9,8 @@ function parse() {
   return { parts, params, path };
 }
 
+export const currentRoute = parse;
+
 export function useRoute() {
   const [route, setRoute] = useState(parse);
   useEffect(() => {

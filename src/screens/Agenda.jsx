@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { TabBar, Fab, StatusBadge } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
@@ -33,6 +33,8 @@ export default function Agenda({ params }) {
   const today = todayISO();
   const [sel, setSelDate] = useState(params.fecha || today);
   const [selId, setSelId] = useState(null);
+  // La misma pantalla puede recibir otra fecha por la URL (p. ej. al volver de reprogramar un turno).
+  useEffect(() => { if (params.fecha) setSelDate(params.fecha); }, [params.fecha]);
   const from = weekStart(sel);
   const to = addDays(from, 6);
   const list = useAppointments(from, to);

@@ -4,7 +4,7 @@ import { TopBar, Avatar, Sheet, Empty } from '../components/ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
-import { back } from '../lib/router.js';
+import { back, navigate, currentRoute } from '../lib/router.js';
 import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
@@ -168,7 +168,14 @@ export default function AppointmentForm({ id, params }) {
         ...(moved && { reminderSent: false }) };
     try {
       await store.saveAppointment(data);
-      back(`/agenda?fecha=${f.date}`);
+      // Si se vuelve a la agenda de otro día (se movió el turno), mostrar el día del turno.
+      window.addEventListener('hashchange', () => {
+        const r = currentRoute();
+        if (r.path === '/agenda' && (r.params.fecha || todayISO()) !== data.date) {
+          navigate(`/agenda?fecha=${data.date}`, { replace: true });
+        }
+      }, { once: true });
+      back(`/agenda?fecha=${data.date}`);
     } catch {
       setError('No se pudo guardar. Revisá la conexión e intentá de nuevo.');
       setSaving(false);

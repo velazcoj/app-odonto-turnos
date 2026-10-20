@@ -47,6 +47,7 @@ export function waLink(phone, text) {
 }
 
 export function telLink(phone) {
-  const d = String(phone || '').replace(/[^\d+]/g, '');
+  // Solo el primer número del campo, sin el interno ni un segundo número.
+  const d = (parts(phone)[0] || '').replace(/[^\d+]/g, '');
   return d ? `tel:${d}` : '';
 }

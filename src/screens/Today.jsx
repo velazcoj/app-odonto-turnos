@@ -118,7 +118,12 @@ export default function Today() {
                     <span className="muted small">{a.start} · <TypeLabel type={a.type} /></span>
                   </div>
                   {a.reminderSent ? (
-                    <span className="sent"><Icon name="check" size={16} />Enviado</span>
+                    // Abrir WhatsApp no garantiza que se haya mandado: tocar "Enviado" lo reabre para reenviar.
+                    link ? (
+                      <a className="sent" href={link} target="_blank" rel="noreferrer" aria-label="Enviado. Tocar para reenviar">
+                        <Icon name="check" size={16} />Enviado
+                      </a>
+                    ) : <span className="sent"><Icon name="check" size={16} />Enviado</span>
                   ) : link ? (
                     <a className="btn small wa" href={link} target="_blank" rel="noreferrer"
                       onClick={() => store.updateAppointment(a.id, { reminderSent: true })}>

@@ -76,7 +76,13 @@ export default function AppointmentSheet({ appt, onClose }) {
               : <span className="action disabled"><Icon name="phone" />Llamar</span>}
             {appt.patientId && <button className="action" onClick={openPatient}><Icon name="user" />Paciente</button>}
           </div>
-          {appt.reminderSent && <div className="hint ok"><Icon name="check" size={16} /> Recordatorio enviado</div>}
+          {appt.reminderSent && (
+            <button className="hint ok" onClick={() => {
+              if (window.confirm('¿Marcar el recordatorio como no enviado?')) store.updateAppointment(appt.id, { reminderSent: false });
+            }}>
+              <Icon name="check" size={16} /> Recordatorio enviado
+            </button>
+          )}
         </>
       )}
       {isBlock && <div className="hint">{durationLabel(appt.duration)} sin turnos.</div>}

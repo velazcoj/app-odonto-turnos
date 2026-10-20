@@ -5,7 +5,7 @@ import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { back } from '../lib/router.js';
-import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm } from '../lib/constants.js';
+import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
 function defaultStart(date, dayStart) {
@@ -245,7 +245,7 @@ export default function AppointmentForm({ id, params }) {
 
         {sameDay && (conflicts.length > 0 ? (
           <div className="hint warn">
-            Se superpone con {conflicts.map((c) => `${c.kind === 'bloqueo' ? (c.label || 'un bloqueo') : c.patientName} (${c.start})`).join(', ')}
+            Se superpone con {conflicts.map((c) => `${c.kind === 'bloqueo' ? (c.label || 'un bloqueo') : apptName(c, patientsById)} (${c.start})`).join(', ')}
           </div>
         ) : (
           <div className="hint ok">

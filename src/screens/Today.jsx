@@ -7,6 +7,7 @@ import { useApp } from '../context.js';
 import { useAppointments, useMinuteTick } from '../lib/hooks.js';
 import { todayISO, addDays, formatLong, timeToMin, minToTime, nowMin, durationLabel } from '../lib/dates.js';
 import { telLink } from '../lib/phone.js';
+import { apptName } from '../lib/constants.js';
 
 const active = (a) => a.kind !== 'bloqueo' && a.status !== 'cancelado' && a.status !== 'ausente';
 
@@ -50,7 +51,7 @@ export default function Today() {
         <div className="next-card">
           <button className="next-info" onClick={() => setSel(next.id)}>
             <div className="next-when">Próximo · {when}</div>
-            <div className="next-name">{next.patientName}</div>
+            <div className="next-name">{apptName(next, patientsById)}</div>
             <div className="next-time">
               {next.start} – {minToTime(timeToMin(next.start) + (next.duration || 30))} · {durationLabel(next.duration || 30)}
             </div>
@@ -92,7 +93,7 @@ export default function Today() {
                 <span className={`day-time${isNext ? ' accent' : ''}`}>{a.start}</span>
                 <span className={`appt-card${isNext ? ' next' : ''}`}>
                   <span className="col gap3">
-                    <span className="appt-name">{a.patientName}</span>
+                    <span className="appt-name">{apptName(a, patientsById)}</span>
                     <TypeLabel type={a.type} />
                   </span>
                   <StatusBadge status={a.status} />
@@ -112,7 +113,7 @@ export default function Today() {
               return (
                 <div key={a.id} className="list-row">
                   <div className="col gap3 grow">
-                    <span className="appt-name">{a.patientName}</span>
+                    <span className="appt-name">{apptName(a, patientsById)}</span>
                     <span className="muted small">{a.start} · <TypeLabel type={a.type} /></span>
                   </div>
                   {a.reminderSent ? (

@@ -38,6 +38,9 @@ export function fillTemplate(tpl, { nombre, dia, hora }) {
 
 // "Lucía Fernández" a partir del paciente
 export const fullName = (p) => (p ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '');
+// Nombre a mostrar en un turno: el del paciente actual; el guardado en el turno queda de respaldo
+// (paciente borrado, o turnos que no llegaron a actualizarse después de editarlo).
+export const apptName = (a, patientsById) => fullName(patientsById?.[a.patientId]) || a.patientName || '';
 export const initials = (p) => `${(p?.firstName || '?')[0] || ''}${(p?.lastName || '')[0] || ''}`.toUpperCase();
 
 // Para buscar sin importar tildes ni mayúsculas

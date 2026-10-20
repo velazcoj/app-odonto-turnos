@@ -3,7 +3,7 @@ import { Sheet, TypeLabel } from './ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { navigate } from '../lib/router.js';
-import { STATUSES, fillTemplate, DEFAULT_SETTINGS } from '../lib/constants.js';
+import { STATUSES, fillTemplate, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import { formatLong, relativeDay, timeToMin, minToTime, durationLabel } from '../lib/dates.js';
 import { waLink, telLink } from '../lib/phone.js';
 
@@ -23,13 +23,14 @@ export default function AppointmentSheet({ appt, onClose }) {
   const isBlock = appt.kind === 'bloqueo';
   const patient = patientsById[appt.patientId];
   const phone = patient?.phone || appt.patientPhone;
+  const name = apptName(appt, patientsById);
   const end = minToTime(timeToMin(appt.start) + (appt.duration || 30));
   const wa = !isBlock && reminderLink(appt, patient, settings);
   const tel = !isBlock && telLink(phone);
 
   const setStatus = (status) => store.updateAppointment(appt.id, { status });
   const remove = async () => {
-    const what = isBlock ? 'este bloqueo' : `el turno de ${appt.patientName}`;
+    const what = isBlock ? 'este bloqueo' : `el turno de ${name}`;
     if (!window.confirm(`¿Eliminar ${what}?`)) return;
     await store.deleteAppointment(appt.id);
     onClose();
@@ -41,7 +42,7 @@ export default function AppointmentSheet({ appt, onClose }) {
     <Sheet open onClose={onClose} title={isBlock ? 'Bloqueo' : 'Turno'}>
       <div className="sheet-head">
         <div>
-          <div className="sheet-title">{isBlock ? (appt.label || 'Horario bloqueado') : appt.patientName}</div>
+          <div className="sheet-title">{isBlock ? (appt.label || 'Horario bloqueado') : name}</div>
           <div className="sheet-sub">
             {formatLong(appt.date)} · {appt.start} – {end}
             {!isBlock && <> · <TypeLabel type={appt.type} /></>}

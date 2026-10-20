@@ -5,7 +5,7 @@ import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { navigate } from '../lib/router.js';
-import { typeOf, DEFAULT_SETTINGS } from '../lib/constants.js';
+import { typeOf, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import {
   todayISO, addDays, weekStart, dayShort, dayNum, monthName, capitalize, formatLong,
   timeToMin, minToTime, durationLabel,
@@ -29,7 +29,7 @@ function buildTimeline(appts, dayStart, dayEnd) {
 }
 
 export default function Agenda({ params }) {
-  const { settings } = useApp();
+  const { settings, patientsById } = useApp();
   const today = todayISO();
   const [sel, setSelDate] = useState(params.fecha || today);
   const [selId, setSelId] = useState(null);
@@ -107,7 +107,7 @@ export default function Agenda({ params }) {
                 <span className="tl-time">{a.start}</span>
                 <button className="tl-card" style={{ background: t.bg, color: t.ink }} onClick={() => setSelId(a.id)}>
                   <span className="col gap3">
-                    <span className="tl-name">{a.patientName}</span>
+                    <span className="tl-name">{apptName(a, patientsById)}</span>
                     <span className="tl-sub" style={{ color: t.color }}>{t.label} · {durationLabel(a.duration || 30)}</span>
                   </span>
                   {a.status !== 'pendiente' && <StatusBadge status={a.status} />}

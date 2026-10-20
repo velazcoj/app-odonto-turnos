@@ -78,6 +78,9 @@ h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
 /* Áreas táctiles de 44 pt sin cambiar cómo se ven: un ::after invisible que agranda el toque. */
 .btn.small::after, .chip::after, .status-btn::after, .segmented button::after { content: ''; position: absolute; }
 .btn.small::after, .chip::after { inset: -4px 0; }
+/* "✓ Enviado" (Hoy) y "Recordatorio enviado" (hoja): texto de ~19 px que se puede tocar. */
+a.sent, button.hint { position: relative; }
+a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12px 0; }
 .btn.block { width: 100%; }
 .btn.big { min-height: 54px; font-size: 17px; font-weight: 800; border-radius: 16px; }
 .btn.wa { background: #E7F6EE; color: #166534; }

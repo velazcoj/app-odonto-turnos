@@ -8,6 +8,20 @@ export function StatusBadge({ status }) {
   return <span className="badge" style={{ background: s.bg, color: s.ink }}>{s.label}</span>;
 }
 
+// Ícono circular del motivo. variant: 'ring' (blanco con borde), 'tint' (fondo suave del motivo),
+// 'next' (negro de marca con ícono menta y halo, para el próximo turno).
+export function TypeIcon({ type, size = 44, variant = 'ring' }) {
+  const t = typeOf(type);
+  const style = { width: size, height: size };
+  if (variant !== 'next') style.color = t.color;
+  if (variant === 'tint') style.background = t.bg;
+  return (
+    <span className={`type-icon ${variant}`} style={style}>
+      <Icon name={t.icon} size={Math.round(size * 0.45)} stroke={1.8} />
+    </span>
+  );
+}
+
 export function TypeLabel({ type }) {
   const t = typeOf(type);
   return <span className="type-label" style={{ color: t.color }}>{t.label}</span>;

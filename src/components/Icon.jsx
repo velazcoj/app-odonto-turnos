@@ -18,6 +18,14 @@ const PATHS = {
   user: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" /></>,
   x: <path d="M18 6L6 18M6 6l12 12" />,
   cake: <path d="M4 21h16M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7M12 12V8M12 5.5a1 1 0 0 0 1-1.5L12 2l-1 2a1 1 0 0 0 1 1.5zM5 16c2 1 3-1 4.7 0s2.6 1 4.6 0 3 1 4.7 0" />,
+  share: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" />,
+  // Marca y motivos de turno (stroke 1.8)
+  tooth: <path d="M8 3c-2.5 0-4.5 2-4.5 5 0 2.2.8 3.6 1.4 5.4.6 1.9.8 4 1.4 6.1.3 1.1 1 2 2 1.6.9-.4 1-2 1.4-3.6.3-1.3.9-2.5 2.3-2.5s2 1.2 2.3 2.5c.4 1.6.5 3.2 1.4 3.6 1 .4 1.7-.5 2-1.6.6-2.1.8-4.2 1.4-6.1.6-1.8 1.4-3.2 1.4-5.4 0-3-2-5-4.5-5-1.6 0-2.6.8-4 .8S9.6 3 8 3z" />,
+  sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />,
+  mirror: <><circle cx="15" cy="7" r="4" /><path d="M12.2 9.8L4 20" /></>,
+  bolt: <path d="M13 2L4 14h7l-1 8 9-12h-7z" />,
+  // Tratamiento: implante (corona, perno y roscas)
+  implant: <path d="M7 3h10l-1.5 5h-7zM9.5 8v9.5L12 21l2.5-3.5V8M9.5 11.5h5M9.5 14.5h5" />,
 };
 
 export default function Icon({ name, size = 22, stroke = 2, style }) {

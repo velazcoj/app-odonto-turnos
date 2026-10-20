@@ -1,9 +1,11 @@
+// Motivos de turno: ícono, color (texto e ícono), fondo suave y tinta sobre ese fondo.
+// Todos los pares de texto pasan WCAG AA (≥ 4.5) sobre blanco, sobre el fondo de la app y sobre su `bg`.
 export const TYPES = [
-  { id: 'consulta', label: 'Consulta', color: '#2563EB', bg: '#DBEAFE', ink: '#1E3A8A' },
-  { id: 'limpieza', label: 'Limpieza', color: '#0F766E', bg: '#CCEDE7', ink: '#134E4A' },
-  { id: 'control', label: 'Control', color: '#7C3AED', bg: '#EDE9FE', ink: '#4C1D95' },
-  { id: 'tratamiento', label: 'Tratamiento', color: '#BE185D', bg: '#FCE7F3', ink: '#831843' },
-  { id: 'urgencia', label: 'Urgencia', color: '#EA580C', bg: '#FFEDD5', ink: '#7C2D12' },
+  { id: 'consulta', label: 'Consulta', icon: 'tooth', color: '#2F4FD8', bg: '#E6EBFC', ink: '#1E3A9E' },
+  { id: 'limpieza', label: 'Limpieza', icon: 'sparkle', color: '#0B6B5F', bg: '#DDF6F1', ink: '#0B5249' },
+  { id: 'control', label: 'Control', icon: 'mirror', color: '#6D28D9', bg: '#EDE9FE', ink: '#4C1D95' },
+  { id: 'tratamiento', label: 'Tratamiento', icon: 'implant', color: '#BE185D', bg: '#FCE7F3', ink: '#831843' },
+  { id: 'urgencia', label: 'Urgencia', icon: 'bolt', color: '#C2410C', bg: '#FFEDD5', ink: '#7C2D12' },
 ];
 
 export const typeOf = (id) => TYPES.find((t) => t.id === id) || TYPES[0];

@@ -116,6 +116,9 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .appt-card.block { border: 1.5px dashed #B9C7C4; background: transparent; color: var(--muted); font-weight: 600; font-size: 15px; }
 .appt-name { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .type-label { font-size: 13px; font-weight: 600; }
+.type-icon { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--card); position: relative; }
+.type-icon.ring { box-shadow: 0 0 0 2px var(--line) inset; }
+.type-icon.next { background: var(--brand); color: var(--mint); box-shadow: 0 0 0 4px var(--mint-soft); }
 .badge { font-size: 12px; font-weight: 700; padding: 5px 9px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
 .sent { display: inline-flex; align-items: center; gap: 4px; color: var(--mint-ink); font-weight: 700; font-size: 14px; }
 

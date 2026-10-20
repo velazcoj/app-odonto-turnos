@@ -64,11 +64,13 @@ function PatientPicker({ open, onClose, onPick }) {
     <Sheet open={open} onClose={onClose} title="Elegir paciente">
       {!creating ? (
         <>
+          <form role="search" onSubmit={(e) => { e.preventDefault(); document.activeElement?.blur(); }}>
           <label className="search in-sheet">
             <Icon name="search" size={20} stroke={2.2} />
             <span className="sr-only">Buscar paciente</span>
-            <input type="search" placeholder="Buscar paciente" value={q} onChange={(e) => setQ(e.target.value)} autoCorrect="off" />
+            <input type="search" placeholder="Buscar paciente" value={q} onChange={(e) => setQ(e.target.value)} autoCorrect="off" enterKeyHint="search" />
           </label>
+          </form>
           <button className="list-row link new-patient" onClick={startCreate}>
             <span className="avatar plus"><Icon name="userPlus" size={20} /></span>
             <span className="appt-name">{q.trim() ? `Nuevo paciente: "${q.trim()}"` : 'Nuevo paciente'}</span>

@@ -108,6 +108,33 @@ document.addEventListener('click', (e) => { lastTap = e.target.closest?.('button
 
 export function Sheet({ open, onClose, children, title }) {
   const ref = useRef(null);
+  const backdrop = useRef(null);
+  // En iOS el teclado no achica el layout viewport (ni vh): tapa la parte de abajo, donde está la hoja.
+  // Se mide cuánto tapa con visualViewport y la hoja se apoya justo arriba, con su alto limitado a lo
+  // que queda visible. Con el teclado cerrado --kb vale 0 y no cambia nada.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const el = backdrop.current;
+    if (!open || !vv || !el) return undefined;
+    let raf = 0;
+    const update = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+        el.style.setProperty('--kb', `${kb}px`);
+        el.style.setProperty('--vvh', `${Math.round(vv.height)}px`);
+        el.toggleAttribute('data-kb', kb > 0);
+      });
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      cancelAnimationFrame(raf);
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [open]);
   useEffect(() => {
     if (!open) return undefined;
     const prev = document.body.style.overflow;
@@ -123,7 +150,7 @@ export function Sheet({ open, onClose, children, title }) {
   }, [open]);
   if (!open) return null;
   return (
-    <div className="sheet-backdrop" onClick={onClose}>
+    <div className="sheet-backdrop" ref={backdrop} onClick={onClose}>
       <div className="sheet" ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-grip" />
         {children}

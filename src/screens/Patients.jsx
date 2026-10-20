@@ -78,13 +78,16 @@ export default function Patients() {
         </div>
       </header>
 
+      {/* En un form, la tecla "Buscar" del teclado lo cierra para ver los resultados. */}
+      <form role="search" onSubmit={(e) => { e.preventDefault(); document.activeElement?.blur(); }}>
       <label className="search">
         <Icon name="search" size={20} stroke={2.2} />
         <span className="sr-only">Buscar paciente</span>
         <input type="search" placeholder="Nombre, apellido o DNI" value={q} onChange={(e) => setQ(e.target.value)}
-          autoCorrect="off" autoCapitalize="off" spellCheck="false" />
-        {q && <button className="clear" onClick={() => setQ('')} aria-label="Borrar búsqueda"><Icon name="x" size={18} /></button>}
+          autoCorrect="off" autoCapitalize="off" spellCheck="false" enterKeyHint="search" />
+        {q && <button type="button" className="clear" onClick={() => setQ('')} aria-label="Borrar búsqueda"><Icon name="x" size={18} /></button>}
       </label>
+      </form>
 
       <div className="chips">
         {FILTERS.map((f) => (

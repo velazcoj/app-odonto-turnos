@@ -271,8 +271,10 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .sheet-backdrop { position: fixed; inset: 0; background: rgba(11, 13, 16, 0.4); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fade 0.15s ease-out; }
 /* overflow:hidden en el body no frena el scroll táctil en iOS: el fondo no toma gestos, y el scroll de
    la hoja no se encadena con la página de atrás. */
-.sheet-backdrop { touch-action: none; }
-.sheet { overscroll-behavior: contain; width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: var(--bg); border-radius: 24px 24px 0 0; padding: 8px 20px calc(var(--bottom) + 20px); display: flex; flex-direction: column; gap: 14px; animation: up 0.2s ease-out; }
+.sheet-backdrop { touch-action: none; padding-bottom: var(--kb, 0px); }
+/* Con el teclado abierto la hoja se apoya sobre él: sin el margen del indicador de inicio. */
+.sheet-backdrop[data-kb] .sheet { padding-bottom: 16px; }
+.sheet { overscroll-behavior: contain; width: 100%; max-width: 560px; max-height: calc(var(--vvh, 100vh) * 0.88); overflow-y: auto; background: var(--bg); border-radius: 24px 24px 0 0; padding: 8px 20px calc(var(--bottom) + 20px); display: flex; flex-direction: column; gap: 14px; animation: up 0.2s ease-out; }
 .sheet:focus { outline: none; }
 .sheet-grip { width: 40px; height: 5px; border-radius: 3px; background: #CDD4D9; align-self: center; margin-bottom: 2px; }
 .sheet-head { display: flex; gap: 12px; align-items: flex-start; }

@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import {
-  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
-  setPersistence, browserLocalPersistence,
+  initializeAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
+  browserLocalPersistence, indexedDBLocalPersistence,
 } from 'firebase/auth';
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
@@ -15,8 +15,10 @@ let auth;
 let db;
 if (firebaseConfig.apiKey) {
   const app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  setPersistence(auth, browserLocalPersistence).catch(() => {});
+  // Sin popupRedirectResolver: solo se usa email y contraseña. getAuth() lo incluye y en iOS carga
+  // apis.google.com y un iframe antes de saber quién está logueada (pantalla en blanco con mala señal).
+  // La sesión hoy vive en localStorage; IndexedDB va segunda para encontrarla si quedó ahí.
+  auth = initializeAuth(app, { persistence: [browserLocalPersistence, indexedDBLocalPersistence] });
   // Caché local: la app abre al instante y funciona aunque no haya señal en el consultorio.
   try {
     db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });

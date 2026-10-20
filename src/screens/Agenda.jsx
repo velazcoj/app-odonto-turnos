@@ -17,14 +17,25 @@ function buildTimeline(appts, dayStart, dayEnd) {
   const items = [];
   let cursor = timeToMin(dayStart);
   const end = timeToMin(dayEnd);
+  // Hueco libre desde cursor hasta `to`, sin pasar del horario de cierre.
+  const gap = (to, min) => {
+    const t = Math.min(to, end);
+    if (t - cursor >= min) items.push({ gap: true, from: cursor, to: t });
+  };
   for (const a of appts) {
     const s = timeToMin(a.start);
-    const e = s + (a.duration || 30);
-    if (occupies(a) && s - cursor >= 30) items.push({ gap: true, from: cursor, to: s });
-    items.push({ appt: a });
-    if (occupies(a)) cursor = Math.max(cursor, e);
+    if (occupies(a)) {
+      gap(s, 30);
+      items.push({ appt: a });
+      cursor = Math.max(cursor, s + (a.duration || 30));
+    } else {
+      // Un cancelado no ocupa lugar, pero el hueco anterior va antes que él para respetar el orden.
+      gap(s, 15);
+      items.push({ appt: a });
+      cursor = Math.max(cursor, s);
+    }
   }
-  if (end - cursor >= 30) items.push({ gap: true, from: cursor, to: end });
+  gap(end, 30);
   return items;
 }
 

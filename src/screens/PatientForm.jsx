@@ -97,8 +97,16 @@ function PatientFields({ id, existing }) {
         <div className="field-row">
           <label className="field"><span>DNI</span>
             <input inputMode="numeric" value={f.dni} onChange={set('dni')} /></label>
-          <label className="field"><span>Nacimiento</span>
-            <input type="date" value={f.birthDate} onChange={set('birthDate')} /></label>
+          {/* El selector de fecha de iOS no tiene una forma confiable de dejarla vacía: "Borrar" lo hace. */}
+          <div className="field">
+            <span className="field-head">
+              <label htmlFor="pf-birth">Nacimiento</label>
+              {f.birthDate && (
+                <button type="button" className="field-clear" onClick={() => setF((x) => ({ ...x, birthDate: '' }))}>Borrar</button>
+              )}
+            </span>
+            <input id="pf-birth" type="date" value={f.birthDate} onChange={set('birthDate')} />
+          </div>
         </div>
         <div className="field-row">
           <label className="field"><span>Obra social</span>

@@ -133,13 +133,13 @@ export default function AppointmentForm({ id, params }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState('');
-  const orig = useRef(null); // día y hora con que se cargó el turno, para saber si se reprogramó
+  const orig = useRef(null); // día, hora y paciente con que se cargó el turno, para saber si cambió
 
   useEffect(() => {
     if (isNew) return;
     store.getAppointment(id).then((a) => {
       if (a) {
-        orig.current = { date: a.date, start: a.start };
+        orig.current = { date: a.date, start: a.start, patientId: a.patientId };
         setF((x) => ({ ...x, ...a }));
         setBlockEnd(endTime(timeToMin(a.start) + (a.duration || 30)));
       } else {
@@ -185,8 +185,10 @@ export default function AppointmentForm({ id, params }) {
     if (conflicts.length && !window.confirm(`Se superpone con ${conflictText}. ¿Guardar igual?`)) return;
     setSaving(true);
     const base = { id: isNew ? undefined : id, date: f.date, start: f.start, duration, notes: (f.notes || '').trim() };
-    // Si se reprogramó, el recordatorio y la confirmación (o el ausente/cancelado) eran del horario viejo.
-    const moved = Boolean(orig.current) && (f.date !== orig.current.date || f.start !== orig.current.start);
+    // Si se reprogramó o pasó a otro paciente, el recordatorio y la confirmación (o el ausente/cancelado)
+    // eran del horario o del paciente anterior.
+    const moved = Boolean(orig.current) && (f.date !== orig.current.date || f.start !== orig.current.start
+      || f.patientId !== orig.current.patientId);
     const data = isBlock
       ? { ...base, kind: 'bloqueo', label: (f.label || '').trim() || 'Bloqueado', patientId: null, patientName: null, patientPhone: null, type: null, status: null }
       : { ...base, kind: 'turno', patientId: f.patientId, patientName, patientPhone: patient?.phone || f.patientPhone || '', type: f.type, status: moved ? 'pendiente' : (f.status || 'pendiente'), label: null,

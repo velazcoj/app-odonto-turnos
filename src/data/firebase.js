@@ -5,7 +5,7 @@ import {
 } from 'firebase/auth';
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-  collection, doc, onSnapshot, query, where, updateDoc, deleteDoc, setDoc, getDoc, getDocs,
+  collection, doc, onSnapshot, query, where, updateDoc, deleteDoc, setDoc, getDoc, getDocFromCache, getDocs,
   writeBatch, serverTimestamp,
 } from 'firebase/firestore';
 import { firebaseConfig } from '../firebase-config.js';
@@ -109,7 +109,9 @@ export function watchPatientAppointments(patientId, cb) {
 }
 
 export async function getAppointment(id) {
-  const s = await getDoc(doc(apptsCol(), id));
+  // Primero la caché: el turno casi siempre está ahí, y getDoc espera al servidor (con señal mala, ~10 s).
+  const ref = doc(apptsCol(), id);
+  const s = await getDocFromCache(ref).catch(() => getDoc(ref));
   return s.exists() ? { id: s.id, ...s.data() } : null;
 }
 

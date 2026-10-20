@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TopBar, Avatar, Sheet } from '../components/ui.jsx';
+import { TopBar, Avatar, Sheet, Empty } from '../components/ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
@@ -117,6 +117,7 @@ export default function AppointmentForm({ id, params }) {
   const [picker, setPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     if (isNew) return;
@@ -124,7 +125,12 @@ export default function AppointmentForm({ id, params }) {
       if (a) {
         setF((x) => ({ ...x, ...a }));
         setBlockEnd(minToTime(timeToMin(a.start) + (a.duration || 30)));
+      } else {
+        setLoadError('Este turno ya no existe. Puede que se haya eliminado.');
       }
+      setLoaded(true);
+    }).catch(() => {
+      setLoadError('No se pudo cargar el turno. Revisá la conexión e intentá de nuevo.');
       setLoaded(true);
     });
   }, [id, isNew]);
@@ -164,12 +170,21 @@ export default function AppointmentForm({ id, params }) {
     }
   };
 
-  if (!loaded) return <div className="screen"><div className="loading">Cargando…</div></div>;
+  const cancel = <button className="link-btn muted" onClick={() => back('/hoy')}>Cancelar</button>;
+  if (!loaded || loadError) {
+    return (
+      <div className="screen">
+        <TopBar left={cancel} />
+        {loadError ? <Empty icon="calendar" title="No se puede editar" text={loadError} />
+          : <div className="loading">Cargando…</div>}
+      </div>
+    );
+  }
 
   return (
     <div className="screen">
       <TopBar
-        left={<button className="link-btn muted" onClick={() => back('/hoy')}>Cancelar</button>}
+        left={cancel}
         title={isNew ? (isBlock ? 'Bloquear horario' : 'Nuevo turno') : (isBlock ? 'Editar bloqueo' : 'Editar turno')}
         right={<button className="link-btn strong" onClick={save} disabled={saving}>{saving ? '…' : 'Guardar'}</button>}
       />

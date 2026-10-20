@@ -307,7 +307,7 @@ export default function AppointmentForm({ id, params }) {
                 {TYPES.map((t) => (
                   <button key={t.id} className="chip-type" aria-pressed={f.type === t.id} onClick={() => set('type', t.id)}
                     style={{ borderColor: f.type === t.id ? t.color : 'transparent', background: f.type === t.id ? t.bg : '#FFFFFF' }}>
-                    <span className="type-dot" style={{ background: t.color }} />{t.label}
+                    <span className="type-glyph" style={{ color: t.color }}><Icon name={t.icon} size={20} stroke={1.8} /></span>{t.label}
                   </button>
                 ))}
               </div>

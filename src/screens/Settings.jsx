@@ -31,7 +31,10 @@ function SettingsForm() {
   };
 
   const save = async () => {
-    await store.saveSettings({ dayStart: f.dayStart, dayEnd: f.dayEnd, workDays: f.workDays, reminderTemplate: f.reminderTemplate });
+    await store.saveSettings({
+      displayName: (f.displayName || '').trim() || DEFAULT_SETTINGS.displayName,
+      dayStart: f.dayStart, dayEnd: f.dayEnd, workDays: f.workDays, reminderTemplate: f.reminderTemplate,
+    });
     setSaved(true);
   };
 
@@ -39,6 +42,10 @@ function SettingsForm() {
     <div className="screen">
       <TopBar left={<BackLink label="Hoy" onClick={() => back('/hoy')} />} title="Ajustes" />
       <div className="form">
+        <label className="field"><span>Nombre a mostrar</span>
+          <input value={f.displayName} onChange={set('displayName')} autoComplete="off" autoCapitalize="words" />
+          <small>Aparece en el saludo de la pantalla Hoy.</small></label>
+
         <SectionTitle>Horario de atención</SectionTitle>
         <div className="muted small">Se usa para mostrar los huecos libres en la agenda.</div>
         <div className="field-row">

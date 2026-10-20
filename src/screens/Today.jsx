@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TabBar, Fab, StatusBadge, TypeLabel, SectionTitle, Empty } from '../components/ui.jsx';
+import { TabBar, StatusBadge, TypeLabel, SectionTitle, Empty } from '../components/ui.jsx';
 import AppointmentSheet, { reminderLink } from '../components/AppointmentSheet.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
@@ -145,8 +145,7 @@ export default function Today() {
         </>
       )}
 
-      <Fab to={`/turno/nuevo?fecha=${today}`} />
-      <TabBar active="hoy" />
+      <TabBar active="hoy" newTo={`/turno/nuevo?fecha=${today}`} />
       {selAppt && <AppointmentSheet appt={selAppt} onClose={() => setSel(null)} />}
     </div>
   );

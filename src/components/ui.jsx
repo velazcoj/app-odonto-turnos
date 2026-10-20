@@ -38,30 +38,23 @@ export function Avatar({ patient, size = 44 }) {
   );
 }
 
-export function TabBar({ active }) {
-  const tabs = [
-    { id: 'hoy', label: 'Hoy', icon: 'clock' },
-    { id: 'agenda', label: 'Agenda', icon: 'calendar' },
-    { id: 'pacientes', label: 'Pacientes', icon: 'users' },
-  ];
+// Barra inferior: Hoy, Agenda, "+" (nuevo turno, en el día que se está mirando) y Pacientes.
+export function TabBar({ active, newTo = '/turno/nuevo' }) {
+  const tab = (id, label, icon) => (
+    <a href={`#/${id}`} className={active === id ? 'tab active' : 'tab'} aria-current={active === id ? 'page' : undefined}>
+      <Icon name={icon} size={24} />
+      {label}
+    </a>
+  );
   return (
     <nav className="tabbar">
-      {tabs.map((t) => (
-        <a key={t.id} href={`#/${t.id}`} className={active === t.id ? 'tab active' : 'tab'}
-          aria-current={active === t.id ? 'page' : undefined}>
-          <Icon name={t.icon} size={24} />
-          {t.label}
-        </a>
-      ))}
+      {tab('hoy', 'Hoy', 'clock')}
+      {tab('agenda', 'Agenda', 'calendar')}
+      <a className="tab-plus" href={`#${newTo}`} aria-label="Nuevo turno">
+        <Icon name="plus" size={24} stroke={2.4} />
+      </a>
+      {tab('pacientes', 'Pacientes', 'users')}
     </nav>
-  );
-}
-
-export function Fab({ to }) {
-  return (
-    <a className="fab" href={`#${to}`} aria-label="Nuevo turno">
-      <Icon name="plus" size={26} stroke={2.4} />
-    </a>
   );
 }
 

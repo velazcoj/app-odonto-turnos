@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TabBar, Fab, StatusBadge } from '../components/ui.jsx';
+import { TabBar, StatusBadge } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
 import { useAppointments, useMinuteTick } from '../lib/hooks.js';
@@ -151,8 +151,7 @@ export default function Agenda({ params }) {
         </div>
       )}
 
-      <Fab to={`/turno/nuevo?fecha=${sel}`} />
-      <TabBar active="agenda" />
+      <TabBar active="agenda" newTo={`/turno/nuevo?fecha=${sel}`} />
       {selAppt && <AppointmentSheet appt={selAppt} onClose={() => setSelId(null)} />}
     </div>
   );

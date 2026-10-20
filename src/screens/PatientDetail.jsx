@@ -6,7 +6,7 @@ import { useApp } from '../context.js';
 import { usePatientAppointments, useMinuteTick } from '../lib/hooks.js';
 import { back, navigate } from '../lib/router.js';
 import { fullName } from '../lib/constants.js';
-import { formatDMY, age, todayISO, monthYear, formatShort } from '../lib/dates.js';
+import { formatDMY, age, todayISO, monthYear, formatShort, hasEnded } from '../lib/dates.js';
 import { waLink, telLink } from '../lib/phone.js';
 
 const ts = (v) => (v?.toDate ? v.toDate() : typeof v === 'number' ? new Date(v) : null);
@@ -33,8 +33,8 @@ export default function PatientDetail({ id }) {
   const since = ts(p.createdAt);
   const today = todayISO();
   const list = appts || [];
-  const upcoming = list.filter((a) => a.date >= today).reverse();
-  const pastList = list.filter((a) => a.date < today);
+  const upcoming = list.filter((a) => !hasEnded(a)).reverse();
+  const pastList = list.filter(hasEnded);
   const visits = pastList.filter((a) => a.status === 'asistio').length;
   const a = age(p.birthDate);
   const selAppt = sel && list.find((x) => x.id === sel);

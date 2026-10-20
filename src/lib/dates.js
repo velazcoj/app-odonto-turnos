@@ -82,6 +82,12 @@ export function nowMin() {
   return d.getHours() * 60 + d.getMinutes();
 }
 
+// ¿El turno ya terminó? (un turno de hoy a las 9 ya no es "próximo" a las 11)
+export function hasEnded(a) {
+  const t = todayISO();
+  return a.date < t || (a.date === t && timeToMin(a.start) + (a.duration || 30) <= nowMin());
+}
+
 export function age(birthISO) {
   if (!birthISO) return null;
   const b = parseISO(birthISO);

@@ -22,19 +22,24 @@ function buildTimeline(appts, dayStart, dayEnd) {
     const t = Math.min(to, end);
     if (t - cursor >= min) items.push({ gap: true, from: cursor, to: t });
   };
-  for (const a of appts) {
+  appts.forEach((a, i) => {
     const s = timeToMin(a.start);
     if (occupies(a)) {
       gap(s, 30);
       items.push({ appt: a });
       cursor = Math.max(cursor, s + (a.duration || 30));
-    } else {
-      // Un cancelado no ocupa lugar, pero el hueco anterior va antes que él para respetar el orden.
-      gap(s, 15);
-      items.push({ appt: a });
-      cursor = Math.max(cursor, s);
+      return;
     }
-  }
+    // Un cancelado no ocupa lugar: el hueco que lo rodea va entero (hasta el próximo turno que ocupa,
+    // o el cierre) y antes que él, para respetar el orden de las horas.
+    if (s > cursor) {
+      const next = appts.slice(i + 1).find(occupies);
+      const to = Math.min(next ? timeToMin(next.start) : end, end);
+      gap(to, 30);
+      cursor = Math.max(cursor, to);
+    }
+    items.push({ appt: a });
+  });
   gap(end, 30);
   return items;
 }

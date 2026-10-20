@@ -25,6 +25,10 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
+/* Barra de estado: con "black-translucent" la app se dibuja debajo de la hora y la batería (en blanco).
+   Una franja fija negra del alto del área segura hace que siempre se lean, en todas las pantallas; en
+   Hoy se funde con la cabecera. Todo el contenido arranca debajo (padding con var(--top)). */
+body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: var(--top); background: var(--brand); z-index: 100; pointer-events: none; }
 body {
   font-family: var(--font);
   font-size: 16px; line-height: 1.35; -webkit-font-smoothing: antialiased;

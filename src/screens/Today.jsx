@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TabBar, StatusBadge, TypeLabel, TypeIcon, Empty, Brand, useThemeColor } from '../components/ui.jsx';
+import { TabBar, StatusBadge, TypeLabel, TypeIcon, Empty, Brand } from '../components/ui.jsx';
 import AppointmentSheet, { reminderLink } from '../components/AppointmentSheet.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
@@ -36,7 +36,6 @@ function Progress({ done, total }) {
 
 export default function Today() {
   useMinuteTick();
-  useThemeColor('#0B0D10');
   const { patientsById, settings } = useApp();
   const today = todayISO();
   const tomorrow = addDays(today, 1);

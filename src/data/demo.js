@@ -54,7 +54,10 @@ function save(s) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* sin storage */ }
 }
 
-let state = load();
+// Se carga recién al primer uso: en producción este módulo viaja en el bundle pero no se usa, y no
+// tiene que sembrar datos de ejemplo en localStorage.
+let state;
+const st = () => { if (!state) state = load(); return state; };
 const commit = () => { save(state); listeners.forEach((l) => l()); };
 const sub = (fn) => { fn(); listeners.add(fn); return () => listeners.delete(fn); };
 const newId = () => Math.random().toString(36).slice(2, 10);
@@ -66,50 +69,50 @@ export const login = async () => {};
 export const logout = async () => { localStorage.removeItem(KEY); location.reload(); };
 export const resetPassword = async () => {};
 
-export const watchSettings = (cb) => sub(() => cb({ ...state.settings }));
-export const saveSettings = async (settings) => { state.settings = { ...state.settings, ...settings }; commit(); };
+export const watchSettings = (cb) => sub(() => cb({ ...st().settings }));
+export const saveSettings = async (settings) => { st().settings = { ...st().settings, ...settings }; commit(); };
 
-export const watchPatients = (cb) => sub(() => cb(state.patients.map((p) => ({ ...p }))));
+export const watchPatients = (cb) => sub(() => cb(st().patients.map((p) => ({ ...p }))));
 
 export async function savePatient(p) {
   if (p.id) {
-    state.patients = state.patients.map((x) => (x.id === p.id ? { ...x, ...p } : x));
+    st().patients = st().patients.map((x) => (x.id === p.id ? { ...x, ...p } : x));
     const name = `${p.firstName} ${p.lastName}`.trim();
-    state.appointments = state.appointments.map((a) =>
+    st().appointments = st().appointments.map((a) =>
       a.patientId === p.id ? { ...a, patientName: name, patientPhone: p.phone || '' } : a);
     commit();
     return p.id;
   }
   const id = newId();
-  state.patients.push({ ...p, id, createdAt: Date.now() });
+  st().patients.push({ ...p, id, createdAt: Date.now() });
   commit();
   return id;
 }
 export const deletePatient = async (id, apptIds = []) => {
-  state.patients = state.patients.filter((p) => p.id !== id);
-  state.appointments = state.appointments.filter((a) => !apptIds.includes(a.id));
+  st().patients = st().patients.filter((p) => p.id !== id);
+  st().appointments = st().appointments.filter((a) => !apptIds.includes(a.id));
   commit();
 };
 
 export const watchAppointmentsRange = (from, to, cb) =>
-  sub(() => cb(state.appointments.filter((a) => a.date >= from && a.date <= to).map((a) => ({ ...a }))));
+  sub(() => cb(st().appointments.filter((a) => a.date >= from && a.date <= to).map((a) => ({ ...a }))));
 export const watchPatientAppointments = (pid, cb) =>
-  sub(() => cb(state.appointments.filter((a) => a.patientId === pid).map((a) => ({ ...a }))));
-export const getAppointment = async (id) => { const a = state.appointments.find((x) => x.id === id); return a ? { ...a } : null; };
+  sub(() => cb(st().appointments.filter((a) => a.patientId === pid).map((a) => ({ ...a }))));
+export const getAppointment = async (id) => { const a = st().appointments.find((x) => x.id === id); return a ? { ...a } : null; };
 
 export async function saveAppointment(a) {
   if (a.id) {
-    state.appointments = state.appointments.map((x) => (x.id === a.id ? { ...x, ...a } : x));
+    st().appointments = st().appointments.map((x) => (x.id === a.id ? { ...x, ...a } : x));
     commit();
     return a.id;
   }
   const id = newId();
-  state.appointments.push({ ...a, id });
+  st().appointments.push({ ...a, id });
   commit();
   return id;
 }
 export const updateAppointment = async (id, partial) => {
-  state.appointments = state.appointments.map((x) => (x.id === id ? { ...x, ...partial } : x));
+  st().appointments = st().appointments.map((x) => (x.id === id ? { ...x, ...partial } : x));
   commit();
 };
-export const deleteAppointment = async (id) => { state.appointments = state.appointments.filter((a) => a.id !== id); commit(); };
+export const deleteAppointment = async (id) => { st().appointments = st().appointments.filter((a) => a.id !== id); commit(); };

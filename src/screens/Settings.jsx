@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { TopBar, BackLink, SectionTitle } from '../components/ui.jsx';
+import { TopBar, SectionTitle, TabBar } from '../components/ui.jsx';
 import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
-import { back } from '../lib/router.js';
 import { DEFAULT_SETTINGS, WEEKDAYS, fillTemplate } from '../lib/constants.js';
 import { buildBackup, shareableFiles } from '../lib/backup.js';
 
@@ -68,9 +67,10 @@ export default function Settings() {
   // si no, tras una recarga mostraría los de fábrica y al guardar pisaría su plantilla.
   if (!settingsReady) {
     return (
-      <div className="screen">
-        <TopBar left={<BackLink label="Hoy" onClick={() => back('/hoy')} />} title="Ajustes" />
+      <div className="screen with-tabs">
+        <TopBar title="Ajustes" />
         <div className="loading">Cargando…</div>
+        <TabBar active="ajustes" />
       </div>
     );
   }
@@ -96,8 +96,8 @@ function SettingsForm() {
   };
 
   return (
-    <div className="screen">
-      <TopBar left={<BackLink label="Hoy" onClick={() => back('/hoy')} />} title="Ajustes" />
+    <div className="screen with-tabs">
+      <TopBar title="Ajustes" />
       <div className="form">
         <label className="field"><span>Nombre a mostrar</span>
           <input value={f.displayName} onChange={set('displayName')} autoComplete="off" autoCapitalize="words" />
@@ -137,6 +137,7 @@ function SettingsForm() {
           {store.isDemo ? 'Reiniciar demo' : 'Cerrar sesión'}
         </button>
       </div>
+      <TabBar active="ajustes" />
     </div>
   );
 }

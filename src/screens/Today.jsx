@@ -73,10 +73,7 @@ export default function Today() {
       <header className={next ? 'today-head with-next' : 'today-head'}>
         <div className="row-between">
           <Brand />
-          <div className="row">
-            <span className="today-date">{formatShort(today)}</span>
-            <a className="icon-btn on-dark" href="#/ajustes" aria-label="Ajustes"><Icon name="settings" /></a>
-          </div>
+          <span className="today-date">{formatShort(today)}</span>
         </div>
         <div className="today-greet">
           <div className="col gap2">

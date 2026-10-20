@@ -51,7 +51,8 @@ export function Avatar({ patient, size = 44 }) {
   );
 }
 
-// Barra inferior: Hoy, Agenda, "+" (nuevo turno, en el día que se está mirando) y Pacientes.
+// Barra inferior en 5 columnas iguales: Hoy, Agenda, "+" (nuevo turno, en el día que se está mirando),
+// Pacientes y Ajustes.
 export function TabBar({ active, newTo = '/turno/nuevo' }) {
   const tab = (id, label, icon) => (
     <a href={`#/${id}`} className={active === id ? 'tab active' : 'tab'} aria-current={active === id ? 'page' : undefined}>
@@ -67,6 +68,7 @@ export function TabBar({ active, newTo = '/turno/nuevo' }) {
         <Icon name="plus" size={24} stroke={2.4} />
       </a>
       {tab('pacientes', 'Pacientes', 'users')}
+      {tab('ajustes', 'Ajustes', 'settings')}
     </nav>
   );
 }

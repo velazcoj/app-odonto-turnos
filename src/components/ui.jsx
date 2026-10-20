@@ -40,7 +40,9 @@ export function TypeLabel({ type }) {
   return <span className="type-label" style={{ color: t.color }}>{t.label}</span>;
 }
 
-const AVATAR_COLORS = [['#DDF6F1', '#0B6B5F'], ['#E6EBFC', '#1E3A9E'], ['#EDE9FE', '#4C1D95'], ['#FFEDD5', '#7C2D12'], ['#FCE7F3', '#831843']];
+// Avatares de iniciales con la paleta de la marca: menta suave, gris y azul suave (todos AA). El color
+// sale del id, así cada paciente tiene siempre el mismo en la lista, la ficha y el selector.
+const AVATAR_COLORS = [['#DDF6F1', '#0B6B5F'], ['#EEF1F3', '#0E1216'], ['#E8ECFC', '#2F4FD8']];
 export function Avatar({ patient, size = 44 }) {
   const key = (patient?.id || patient?.lastName || 'x').split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   const [bg, ink] = AVATAR_COLORS[key % AVATAR_COLORS.length];

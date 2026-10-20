@@ -235,3 +235,8 @@ h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
 
 @keyframes fade { from { opacity: 0; } }
 @keyframes up { from { transform: translateY(40px); opacity: 0.6; } }
+
+/* "Reducir movimiento" del iPhone */
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .sheet-backdrop { animation: none; }
+}

@@ -1,5 +1,5 @@
 import Icon from './Icon.jsx';
-import { Sheet, TypeLabel } from './ui.jsx';
+import { Sheet, TypeLabel, TypeIcon } from './ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { navigate } from '../lib/router.js';
@@ -41,7 +41,10 @@ export default function AppointmentSheet({ appt, onClose }) {
   return (
     <Sheet open onClose={onClose} title={isBlock ? 'Bloqueo' : 'Turno'}>
       <div className="sheet-head">
-        <div>
+        {isBlock
+          ? <span className="dl-icon block"><Icon name="lock" size={20} stroke={1.8} /></span>
+          : <TypeIcon type={appt.type} size={48} variant="tint" />}
+        <div className="grow">
           <div className="sheet-title">{isBlock ? (appt.label || 'Horario bloqueado') : name}</div>
           <div className="sheet-sub">
             {formatLong(appt.date)} · {appt.start} – {end}

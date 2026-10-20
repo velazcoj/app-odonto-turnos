@@ -109,7 +109,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 
 /* Hoy: cabecera negra */
 .screen.today { padding-top: 0; }
-.today-head { background: var(--brand); color: #F2F4F5; border-radius: 0 0 32px 32px; padding: calc(var(--top) + 14px) 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.today-head { background: var(--brand); color: #F2F4F5; border-radius: 0 0 32px 32px; padding: calc(var(--top) + 14px) 20px 22px; display: flex; flex-direction: column; gap: 18px; }
 .demo-banner + .screen.today .today-head { padding-top: 12px; }
 .today-head.with-next { padding-bottom: 64px; }
 .today-date { font-size: 13px; font-weight: 600; color: #9AA4AD; white-space: nowrap; }
@@ -125,7 +125,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 /* Hoy: tarjeta del próximo paciente, superpuesta a la cabecera */
 .next-card { position: relative; margin: -46px 20px 0; background: var(--card); border-radius: 24px; padding: 16px; box-shadow: 0 10px 30px rgba(14, 18, 22, 0.08); display: flex; flex-direction: column; gap: 14px; }
 .next-info { display: flex; gap: 12px; align-items: center; text-align: left; width: 100%; min-width: 0; }
-.next-hour { width: 56px; height: 56px; border-radius: 16px; background: var(--mint-soft); color: var(--mint-ink); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+.next-hour { width: 52px; height: 52px; border-radius: 16px; background: var(--mint-soft); color: var(--mint-ink); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
 .next-when { font-size: 12px; font-weight: 700; color: var(--mint-ink); letter-spacing: 1px; text-transform: uppercase; }
 .next-name { font-size: 20px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .next-sub { font-size: 14px; color: var(--muted); }
@@ -142,7 +142,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 
 /* Hoy: agenda del día como línea de tiempo */
 .day-line { margin: 0 20px; display: flex; flex-direction: column; position: relative; }
-.day-line::before { content: ''; position: absolute; left: 21px; top: 14px; bottom: 14px; width: 2px; background: var(--line); }
+.day-line::before { content: ''; position: absolute; left: 21px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
 .dl-row { display: flex; gap: 14px; align-items: center; padding: 8px 0; width: 100%; min-height: 60px; text-align: left; }
 .dl-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
 .dl-icon.block { background: var(--bg); border: 2px dashed #C9D1D6; color: var(--muted); }
@@ -160,7 +160,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .type-icon { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--card); position: relative; }
 .type-icon.ring { box-shadow: 0 0 0 2px var(--line) inset; }
 .type-icon.next { background: var(--brand); color: var(--mint); box-shadow: 0 0 0 4px var(--mint-soft); }
-.badge { font-size: 12px; font-weight: 700; padding: 5px 9px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+.badge { font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
 .sent { display: inline-flex; align-items: center; gap: 4px; color: var(--mint-ink); font-weight: 700; font-size: 14px; }
 
 /* tarjetas y listas */
@@ -216,11 +216,11 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 
 /* barra de pestañas */
 /* Grilla para que el "+" quede en el centro exacto: Hoy y Agenda a la izquierda, Pacientes a la derecha. */
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: #FFFFFF; border-top: 1px solid #E6EAEC; display: grid; grid-template-columns: 1fr 1fr 72px 2fr; justify-items: center; align-items: start; padding: 8px max(8px, calc(50% - 272px)) calc(var(--bottom) + 8px); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: #FFFFFF; border-top: 1px solid #E6EAEC; display: grid; grid-template-columns: 1fr 1fr 72px 2fr; justify-items: center; align-items: start; padding: 10px max(8px, calc(50% - 272px)) calc(var(--bottom) + 8px); }
 /* "+" central: nuevo turno. Reemplaza al botón flotante. */
 .tab-plus { width: 54px; height: 54px; margin-top: -24px; border-radius: 50%; background: var(--brand); color: var(--mint); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 18px rgba(11, 13, 16, 0.25); }
 .tab-plus:active { background: #23282E; }
-.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: #6B7680; min-width: 72px; min-height: 48px; justify-content: center; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #6B7680; min-width: 72px; min-height: 48px; justify-content: center; }
 .tab.active { color: var(--brand); font-weight: 700; }
 
 /* ficha */

@@ -7,7 +7,7 @@ import { usePatientAppointments, useMinuteTick } from '../lib/hooks.js';
 import { back, navigate } from '../lib/router.js';
 import { fullName } from '../lib/constants.js';
 import { formatDMY, age, todayISO, monthYear, formatShort, hasEnded } from '../lib/dates.js';
-import { waLink, telLink } from '../lib/phone.js';
+import { waLink, telLink, noWaText } from '../lib/phone.js';
 
 const ts = (v) => (v?.toDate ? v.toDate() : typeof v === 'number' ? new Date(v) : null);
 
@@ -87,9 +87,9 @@ export default function PatientDetail({ id }) {
 
       <div className="quick-actions">
         {wa ? <a className="qa" href={wa} target="_blank" rel="noreferrer"><Icon name="whatsapp" />WhatsApp</a>
-          : <span className="qa disabled"><Icon name="whatsapp" />WhatsApp</span>}
+          : <span className="qa disabled" aria-disabled="true"><Icon name="whatsapp" />{noWaText(p.phone)}</span>}
         {tel ? <a className="qa" href={tel}><Icon name="phone" />Llamar</a>
-          : <span className="qa disabled"><Icon name="phone" />Llamar</span>}
+          : <span className="qa disabled" aria-disabled="true"><Icon name="phone" />Sin teléfono</span>}
         <button className="qa dark" onClick={() => navigate(newAppt)}><Icon name="calendarPlus" />Dar turno</button>
       </div>
 

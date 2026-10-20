@@ -8,7 +8,7 @@ import { useAppointments, useMinuteTick } from '../lib/hooks.js';
 import {
   todayISO, addDays, formatShort, timeToMin, nowMin, durationLabel, nextWorkDay, dayName, dayShort,
 } from '../lib/dates.js';
-import { telLink } from '../lib/phone.js';
+import { telLink, noWaText } from '../lib/phone.js';
 import { apptName, typeOf, DEFAULT_SETTINGS } from '../lib/constants.js';
 
 const active = (a) => a.kind !== 'bloqueo' && a.status !== 'cancelado' && a.status !== 'ausente';
@@ -66,7 +66,8 @@ export default function Today() {
     else when = `En ${Math.floor(diff / 60)} h ${diff % 60 ? `${diff % 60} min` : ''}`.trim();
   }
   const nextWa = next && reminderLink(next, patientsById[next.patientId], settings);
-  const nextTel = next && telLink(patientsById[next.patientId]?.phone || next.patientPhone);
+  const nextPhone = next && (patientsById[next.patientId]?.phone || next.patientPhone);
+  const nextTel = next && telLink(nextPhone);
 
   return (
     <div className="screen with-tabs today">
@@ -98,16 +99,16 @@ export default function Today() {
             </span>
           </button>
           <div className="row gap10">
-            {nextWa && (
+            {nextWa ? (
               <a className="next-btn solid" target="_blank" rel="noreferrer" href={nextWa}>
                 <Icon name="whatsapp" size={18} />WhatsApp
               </a>
-            )}
-            {nextTel && (
+            ) : <span className="next-btn disabled" aria-disabled="true"><Icon name="whatsapp" size={18} />{noWaText(nextPhone)}</span>}
+            {nextTel ? (
               <a className="next-btn soft" href={nextTel}>
                 <Icon name="phone" size={18} />Llamar
               </a>
-            )}
+            ) : <span className="next-btn disabled" aria-disabled="true"><Icon name="phone" size={18} />Sin teléfono</span>}
           </div>
         </div>
       )}
@@ -177,7 +178,7 @@ export default function Today() {
                       onClick={() => store.updateAppointment(a.id, { reminderSent: true })}>
                       <Icon name="whatsapp" size={16} />Enviar
                     </a>
-                  ) : <span className="muted small">Sin teléfono</span>}
+                  ) : <span className="muted small">{noWaText(patientsById[a.patientId]?.phone || a.patientPhone)}</span>}
                 </div>
               );
             })}

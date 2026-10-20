@@ -129,6 +129,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .next-btn.solid { background: var(--brand); color: #FFF; }
 .next-btn.solid svg { color: var(--mint); }
 .next-btn.soft { background: var(--gray-btn); color: var(--ink); font-weight: 600; }
+.next-btn.disabled { background: transparent; box-shadow: 0 0 0 1px var(--line) inset; color: var(--muted); font-weight: 600; }
 
 /* títulos de sección grandes (Hoy, Ficha) */
 .section-head { margin: 28px 20px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
@@ -225,7 +226,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .qa { height: 64px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); color: var(--ink); font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .qa.dark { background: var(--brand); color: #FFF; box-shadow: none; }
 .qa.dark svg { color: var(--mint); }
-.qa.disabled { color: #8A959D; }
+.qa.disabled { color: var(--muted); box-shadow: 0 0 0 1px var(--line) inset; background: transparent; }
 .card.info { margin-top: 18px; }
 .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 13px 16px; font-size: 15px; }
 .info-row + .info-row { border-top: 1px solid var(--line-soft); }
@@ -285,7 +286,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .action { min-height: 60px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); color: var(--ink); font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .action.primary { background: var(--brand); color: #FFF; box-shadow: none; }
 .action.primary svg { color: var(--mint); }
-.action.disabled { color: #8A959D; }
+.action.disabled { color: var(--muted); box-shadow: 0 0 0 1px var(--line) inset; background: transparent; }
 .picker-list { display: flex; flex-direction: column; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); }
 .new-patient { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); }
 

@@ -5,7 +5,7 @@ import { useApp } from '../context.js';
 import { navigate } from '../lib/router.js';
 import { STATUSES, fillTemplate, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import { formatLong, relativeDay, timeToMin, minToTime, durationLabel } from '../lib/dates.js';
-import { waLink, telLink } from '../lib/phone.js';
+import { waLink, telLink, noWaText } from '../lib/phone.js';
 
 export function reminderLink(appt, patient, settings) {
   const phone = patient?.phone || appt.patientPhone;
@@ -74,9 +74,9 @@ export default function AppointmentSheet({ appt, onClose }) {
                 onClick={() => store.updateAppointment(appt.id, { reminderSent: true })}>
                 <Icon name="whatsapp" />Recordar
               </a>
-            ) : <span className="action disabled"><Icon name="whatsapp" />Sin teléfono</span>}
+            ) : <span className="action disabled" aria-disabled="true"><Icon name="whatsapp" />{noWaText(phone)}</span>}
             {tel ? <a className="action" href={tel}><Icon name="phone" />Llamar</a>
-              : <span className="action disabled"><Icon name="phone" />Llamar</span>}
+              : <span className="action disabled" aria-disabled="true"><Icon name="phone" />Sin teléfono</span>}
             {patient && <button className="action" onClick={openPatient}><Icon name="user" />Paciente</button>}
           </div>
           {appt.reminderSent && (

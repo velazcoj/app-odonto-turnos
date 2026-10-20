@@ -60,6 +60,9 @@ export function waNumber(phone) {
   return (valid.find((p) => MOBILE.test(p.raw)) || valid[0])?.wa || '';
 }
 
+// Texto del botón de WhatsApp cuando no hay link: no hay número, o hay uno que no se pudo armar.
+export const noWaText = (phone) => (String(phone || '').trim() ? 'Revisar número' : 'Sin teléfono');
+
 export function waLink(phone, text) {
   const n = waNumber(phone);
   const q = text ? `?text=${encodeURIComponent(text)}` : '';

@@ -2,6 +2,18 @@ import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 
+// "Demasiados intentos" no es lo mismo que "contraseña incorrecta": si no se lo dice, sigue probando
+// y alarga el bloqueo.
+function loginError(code = '') {
+  if (code.includes('network')) return 'Sin conexión. Probá de nuevo.';
+  if (code.includes('too-many-requests')) return 'Demasiados intentos. Esperá unos minutos o cambiá la contraseña con "Olvidé mi contraseña".';
+  if (['invalid-credential', 'wrong-password', 'user-not-found', 'invalid-email', 'missing-password'].some((c) => code.includes(c))) {
+    return 'Email o contraseña incorrectos.';
+  }
+  if (code.includes('user-disabled')) return 'Esta cuenta está deshabilitada.';
+  return 'No se pudo ingresar. Probá de nuevo en un rato.';
+}
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
@@ -15,8 +27,7 @@ export default function Login() {
     try {
       await store.login(email, pw);
     } catch (ex) {
-      const c = ex?.code || '';
-      setErr(c.includes('network') ? 'Sin conexión. Probá de nuevo.' : 'Email o contraseña incorrectos.');
+      setErr(loginError(ex?.code));
       setBusy(false);
     }
   };
@@ -27,8 +38,8 @@ export default function Login() {
     try {
       await store.resetPassword(email);
       setMsg('Te mandamos un email para cambiar la contraseña.');
-    } catch {
-      setErr('No se pudo enviar el email. Revisá la dirección.');
+    } catch (ex) {
+      setErr((ex?.code || '').includes('network') ? 'Sin conexión. Probá de nuevo.' : 'No se pudo enviar el email. Revisá la dirección.');
     }
   };
 

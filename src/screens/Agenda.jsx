@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { TabBar, Fab, StatusBadge } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
-import { useAppointments } from '../lib/hooks.js';
+import { useAppointments, useMinuteTick } from '../lib/hooks.js';
 import { navigate } from '../lib/router.js';
 import { typeOf, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import {
@@ -40,12 +40,20 @@ function buildTimeline(appts, dayStart, dayEnd) {
 }
 
 export default function Agenda({ params }) {
+  useMinuteTick();
   const { settings, patientsById } = useApp();
   const today = todayISO();
   const [sel, setSelDate] = useState(params.fecha || today);
   const [selId, setSelId] = useState(null);
   // La misma pantalla puede recibir otra fecha por la URL (p. ej. al volver de reprogramar un turno).
   useEffect(() => { if (params.fecha) setSelDate(params.fecha); }, [params.fecha]);
+  // Si pasó la medianoche con la agenda abierta mirando "hoy", seguir en el nuevo hoy.
+  const prevToday = useRef(today);
+  useEffect(() => {
+    if (prevToday.current === today) return;
+    if (sel === prevToday.current) pick(today);
+    prevToday.current = today;
+  });
   const from = weekStart(sel);
   const to = addDays(from, 6);
   const list = useAppointments(from, to);

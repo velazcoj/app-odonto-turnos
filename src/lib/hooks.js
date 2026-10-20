@@ -27,11 +27,20 @@ export function usePatientAppointments(patientId) {
   return list;
 }
 
-// Re-render cada minuto (para "en 25 min", "ahora", etc.)
+// Re-render cada 30 s (para "en 25 min", "ahora", el cambio de día) y apenas vuelve a la app:
+// iOS congela los timers en segundo plano y al volver mostraba unos segundos el día anterior.
 export function useMinuteTick() {
   const [, set] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => set((n) => n + 1), 30000);
-    return () => clearInterval(t);
+    const tick = () => set((n) => n + 1);
+    const onVisible = () => { if (document.visibilityState === 'visible') tick(); };
+    const t = setInterval(tick, 30000);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pageshow', tick);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('pageshow', tick);
+    };
   }, []);
 }

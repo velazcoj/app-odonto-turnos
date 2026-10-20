@@ -3,7 +3,7 @@ import Icon from '../components/Icon.jsx';
 import { TopBar, BackLink, Avatar, StatusBadge, TypeLabel, SectionTitle, Empty } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
-import { usePatientAppointments } from '../lib/hooks.js';
+import { usePatientAppointments, useMinuteTick } from '../lib/hooks.js';
 import { back, navigate } from '../lib/router.js';
 import { fullName } from '../lib/constants.js';
 import { formatDMY, age, todayISO, monthYear, formatShort } from '../lib/dates.js';
@@ -12,6 +12,7 @@ import { waLink, telLink } from '../lib/phone.js';
 const ts = (v) => (v?.toDate ? v.toDate() : typeof v === 'number' ? new Date(v) : null);
 
 export default function PatientDetail({ id }) {
+  useMinuteTick();
   const { patientsById, patients } = useApp();
   const p = patientsById[id];
   const appts = usePatientAppointments(id);

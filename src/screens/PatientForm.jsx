@@ -4,7 +4,7 @@ import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { back, navigate } from '../lib/router.js';
-import { INSURANCES } from '../lib/constants.js';
+import { INSURANCES, findDuplicate, duplicateQuestion } from '../lib/constants.js';
 
 const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
 const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
@@ -27,6 +27,7 @@ export default function PatientForm({ id }) {
 
 // Editar o crear lo decide el id de la ruta, no si el paciente está cargado.
 function PatientFields({ id, existing }) {
+  const { patients } = useApp();
   const [f, setF] = useState(() => ({ ...EMPTY, ...(existing || {}) }));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -35,6 +36,8 @@ function PatientFields({ id, existing }) {
   const save = async (e) => {
     e.preventDefault();
     if (!f.firstName.trim() || !f.lastName.trim()) { setError('Completá nombre y apellido.'); return; }
+    const dup = !id && findDuplicate(patients, f);
+    if (dup && !window.confirm(duplicateQuestion(dup))) return;
     setSaving(true);
     setError('');
     try {

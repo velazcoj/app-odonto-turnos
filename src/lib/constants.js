@@ -45,3 +45,15 @@ export const initials = (p) => `${(p?.firstName || '?')[0] || ''}${(p?.lastName 
 
 // Para buscar sin importar tildes ni mayúsculas
 export const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+// Posible duplicado al crear: mismo nombre y apellido (en cualquier orden) o mismo DNI. El celular no
+// cuenta: es común cargar a los chicos con el de la madre o el padre.
+const digits = (s) => String(s || '').replace(/\D/g, '');
+const nameKey = (p) => [norm(p.firstName), norm(p.lastName)].sort().join(' ');
+export function findDuplicate(patients, p) {
+  const k = nameKey(p);
+  const dni = digits(p.dni);
+  return (patients || []).find((x) => nameKey(x) === k || (dni && digits(x.dni) === dni));
+}
+export const duplicateQuestion = (d) =>
+  `Ya tenés a ${fullName(d)}${d.phone ? ` (${d.phone})` : ''}. ¿Crear otro paciente igual?`;

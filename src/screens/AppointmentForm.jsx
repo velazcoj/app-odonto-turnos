@@ -5,7 +5,7 @@ import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { back, navigate, currentRoute } from '../lib/router.js';
-import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName } from '../lib/constants.js';
+import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName, findDuplicate, duplicateQuestion } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
 // Fin de un bloqueo: "24:30" no es una hora válida para el input, cortar a las 23:59.
@@ -28,7 +28,13 @@ function PatientPicker({ open, onClose, onPick }) {
 
   const list = useMemo(() => {
     const nq = norm(q);
-    const l = (patients || []).filter((p) => !nq || nq.split(/\s+/).every((w) => norm([p.firstName, p.lastName, p.dni].filter(Boolean).join(' ')).includes(w)));
+    const l = (patients || []).filter((p) => {
+      if (!nq) return true;
+      const hay = norm([p.firstName, p.lastName, p.dni].filter(Boolean).join(' '));
+      // Teléfono por dígitos, como en Pacientes: el guardado tiene espacios y guiones.
+      const digits = `${(p.dni || '').replace(/\D/g, '')} ${(p.phone || '').replace(/\D/g, '')}`;
+      return nq.split(/\s+/).every((w) => hay.includes(w) || (/^\d+$/.test(w) && digits.includes(w)));
+    });
     return l.sort((a, b) => norm(a.lastName + a.firstName).localeCompare(norm(b.lastName + b.firstName))).slice(0, 50);
   }, [patients, q]);
 
@@ -40,13 +46,18 @@ function PatientPicker({ open, onClose, onPick }) {
 
   const create = async () => {
     if (!np.firstName.trim() || !np.lastName.trim()) return;
-    setSaving(true);
     const data = { firstName: np.firstName.trim(), lastName: np.lastName.trim(), phone: np.phone.trim() };
-    const id = await store.savePatient(data);
-    setSaving(false);
-    setCreating(false);
-    setQ('');
-    onPick({ id, ...data });
+    const dup = findDuplicate(patients, data);
+    if (dup && !window.confirm(duplicateQuestion(dup))) return;
+    setSaving(true);
+    try {
+      const id = await store.savePatient(data);
+      setCreating(false);
+      setQ('');
+      onPick({ id, ...data });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

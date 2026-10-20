@@ -8,7 +8,7 @@ import { navigate } from '../lib/router.js';
 import { typeOf, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import {
   todayISO, addDays, weekStart, dayShort, dayNum, monthName, capitalize, formatLong,
-  timeToMin, minToTime, durationLabel,
+  timeToMin, minToTime, durationLabel, isWorkDay,
 } from '../lib/dates.js';
 
 const occupies = (a) => a.status !== 'cancelado';
@@ -63,7 +63,10 @@ export default function Agenda({ params }) {
 
   const pick = (d) => { setSelDate(d); navigate(`/agenda?fecha=${d}`, { replace: true }); };
   const dayAppts = (list || []).filter((a) => a.date === sel);
-  const timeline = buildTimeline(dayAppts, dayStart, dayEnd);
+  const workDays = settings.workDays || DEFAULT_SETTINGS.workDays;
+  const workDay = isWorkDay(sel, workDays);
+  // Un día que no atiende no ofrece huecos libres (los turnos que tenga se muestran igual).
+  const timeline = buildTimeline(dayAppts, dayStart, dayEnd).filter((it) => workDay || !it.gap);
   const selAppt = selId && (list || []).find((a) => a.id === selId);
   const countFor = (d) => (list || []).filter((a) => a.date === d && a.kind !== 'bloqueo' && a.status !== 'cancelado').length;
 
@@ -137,7 +140,9 @@ export default function Agenda({ params }) {
               </div>
             );
           })}
-          {timeline.length === 0 && <div className="loading">Sin horario de atención configurado.</div>}
+          {timeline.length === 0 && (
+            <div className="loading">{workDay ? 'Sin horario de atención configurado.' : 'No atendés este día. Lo podés cambiar en Ajustes.'}</div>
+          )}
         </div>
       )}
 

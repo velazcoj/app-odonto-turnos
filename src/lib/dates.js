@@ -26,6 +26,9 @@ export function addDays(s, n) {
   return toISO(d);
 }
 
+// ¿Atiende ese día? workDays: [0..6] como Date.getDay().
+export const isWorkDay = (s, workDays) => workDays.includes(parseISO(s).getDay());
+
 export function weekStart(s) {
   const d = parseISO(s);
   const dow = (d.getDay() + 6) % 7; // lunes = 0

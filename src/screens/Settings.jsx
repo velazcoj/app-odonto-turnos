@@ -3,7 +3,7 @@ import { TopBar, BackLink, SectionTitle } from '../components/ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { back } from '../lib/router.js';
-import { DEFAULT_SETTINGS, fillTemplate } from '../lib/constants.js';
+import { DEFAULT_SETTINGS, WEEKDAYS, fillTemplate } from '../lib/constants.js';
 
 export default function Settings() {
   const { settingsReady } = useApp();
@@ -25,9 +25,13 @@ function SettingsForm() {
   const [f, setF] = useState(() => ({ ...DEFAULT_SETTINGS, ...settings }));
   const [saved, setSaved] = useState(false);
   const set = (k) => (e) => { setSaved(false); setF((x) => ({ ...x, [k]: e.target.value })); };
+  const toggleDay = (d) => {
+    setSaved(false);
+    setF((x) => ({ ...x, workDays: x.workDays.includes(d) ? x.workDays.filter((w) => w !== d) : [...x.workDays, d].sort() }));
+  };
 
   const save = async () => {
-    await store.saveSettings({ dayStart: f.dayStart, dayEnd: f.dayEnd, reminderTemplate: f.reminderTemplate });
+    await store.saveSettings({ dayStart: f.dayStart, dayEnd: f.dayEnd, workDays: f.workDays, reminderTemplate: f.reminderTemplate });
     setSaved(true);
   };
 
@@ -40,6 +44,16 @@ function SettingsForm() {
         <div className="field-row">
           <label className="field"><span>Desde</span><input type="time" step="900" value={f.dayStart} onChange={set('dayStart')} /></label>
           <label className="field"><span>Hasta</span><input type="time" step="900" value={f.dayEnd} onChange={set('dayEnd')} /></label>
+        </div>
+        <div className="field">
+          <span>Días que atendés</span>
+          <div className="chip-grid seven">
+            {WEEKDAYS.map(([d, label]) => (
+              <button key={d} className={f.workDays.includes(d) ? 'chip-lg on' : 'chip-lg'} aria-pressed={f.workDays.includes(d)} onClick={() => toggleDay(d)}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <SectionTitle>Mensaje de recordatorio</SectionTitle>

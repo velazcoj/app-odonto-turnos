@@ -108,7 +108,7 @@ function PatientFields({ id, existing }) {
         <label className="field"><span>Nota</span>
           <textarea rows={3} value={f.notes} onChange={set('notes')} placeholder="Ej.: prefiere turnos a la tarde" /></label>
 
-        {error && <div className="error">{error}</div>}
+        {error && <div className="error" role="alert">{error}</div>}
         <button type="submit" className="btn primary block" disabled={saving}>{saving ? 'Guardando…' : 'Guardar paciente'}</button>
         {id && (
           <button type="button" className="btn ghost danger block" onClick={remove} disabled={appts === null}><Icon name="trash" size={18} />Eliminar paciente</button>

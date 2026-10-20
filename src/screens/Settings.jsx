@@ -48,7 +48,7 @@ function SettingsForm() {
         <div className="muted small">Podés usar {'{nombre}'}, {'{dia}'} y {'{hora}'}. Ejemplo:</div>
         <div className="bubble">{fillTemplate(f.reminderTemplate, { nombre: 'Lucía', dia: 'mañana', hora: '15:00' })}</div>
 
-        <button className="btn primary block big" onClick={save}>{saved ? 'Guardado ✓' : 'Guardar ajustes'}</button>
+        <button className="btn primary block big" onClick={save} aria-live="polite">{saved ? 'Guardado ✓' : 'Guardar ajustes'}</button>
 
         <SectionTitle>Cuenta</SectionTitle>
         <div className="muted small">{store.isDemo ? 'Modo demo: los datos son de ejemplo y quedan solo en este teléfono.' : `Ingresaste como ${user?.email}`}</div>

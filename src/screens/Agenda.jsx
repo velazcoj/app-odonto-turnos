@@ -86,7 +86,8 @@ export default function Agenda({ params }) {
           const n = countFor(d);
           const cls = ['week-day', d === sel && 'on', d === today && 'today', d < today && 'past'].filter(Boolean).join(' ');
           return (
-            <button key={d} className={cls} onClick={() => pick(d)} aria-label={formatLong(d)}>
+            <button key={d} className={cls} onClick={() => pick(d)} aria-pressed={d === sel}
+              aria-label={`${formatLong(d)}, ${n === 0 ? 'sin turnos' : n === 1 ? '1 turno' : `${n} turnos`}`}>
               <span className="wd">{dayShort(d)}</span>
               <span className="wn">{dayNum(d)}</span>
               <span className="dots">

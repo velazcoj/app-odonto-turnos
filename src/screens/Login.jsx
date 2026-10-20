@@ -53,7 +53,7 @@ export default function Login() {
           <input type="email" inputMode="email" autoComplete="username" autoCapitalize="off" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
         <label className="field"><span>Contraseña</span>
           <input type="password" autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} /></label>
-        {err && <div className="error">{err}</div>}
+        {err && <div className="error" role="alert">{err}</div>}
         {msg && <div className="hint ok">{msg}</div>}
         <button className="btn primary block big" disabled={busy || !email || !pw}>{busy ? 'Ingresando…' : 'Ingresar'}</button>
         <button type="button" className="link-btn center-btn" onClick={reset}>Olvidé mi contraseña</button>

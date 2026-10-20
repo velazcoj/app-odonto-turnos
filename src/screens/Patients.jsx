@@ -88,7 +88,7 @@ export default function Patients() {
 
       <div className="chips">
         {FILTERS.map((f) => (
-          <button key={f.id} className={filter === f.id ? 'chip on' : 'chip'} onClick={() => setFilter(f.id)}>{f.label}</button>
+          <button key={f.id} className={filter === f.id ? 'chip on' : 'chip'} aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>{f.label}</button>
         ))}
       </div>
 

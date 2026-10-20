@@ -57,7 +57,7 @@ export default function AppointmentSheet({ appt, onClose }) {
           <div className="sheet-label">Estado</div>
           <div className="status-grid">
             {STATUSES.map((s) => (
-              <button key={s.id} className={appt.status === s.id ? 'status-btn on' : 'status-btn'}
+              <button key={s.id} className={appt.status === s.id ? 'status-btn on' : 'status-btn'} aria-pressed={appt.status === s.id}
                 style={appt.status === s.id ? { background: s.bg, color: s.ink, borderColor: s.ink } : undefined}
                 onClick={() => setStatus(s.id)}>
                 {s.label}

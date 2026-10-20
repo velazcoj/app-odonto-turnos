@@ -223,14 +223,14 @@ export default function AppointmentForm({ id, params }) {
       <TopBar
         left={cancel}
         title={isNew ? (isBlock ? 'Bloquear horario' : 'Nuevo turno') : (isBlock ? 'Editar bloqueo' : 'Editar turno')}
-        right={<button className="link-btn strong" onClick={save} disabled={saving}>{saving ? '…' : 'Guardar'}</button>}
+        right={<button className="link-btn strong" onClick={save} disabled={saving}>{saving ? <span aria-label="Guardando">…</span> : 'Guardar'}</button>}
       />
 
       <div className="form">
         {isNew && (
           <div className="segmented">
-            <button className={!isBlock ? 'on' : ''} onClick={() => set('kind', 'turno')}>Turno</button>
-            <button className={isBlock ? 'on' : ''} onClick={() => set('kind', 'bloqueo')}>Bloquear horario</button>
+            <button className={!isBlock ? 'on' : ''} aria-pressed={!isBlock} onClick={() => set('kind', 'turno')}>Turno</button>
+            <button className={isBlock ? 'on' : ''} aria-pressed={isBlock} onClick={() => set('kind', 'bloqueo')}>Bloquear horario</button>
           </div>
         )}
 
@@ -275,11 +275,11 @@ export default function AppointmentForm({ id, params }) {
         <div className="muted small">{formatLong(f.date)}</div>
 
         {sameDay && (conflicts.length > 0 ? (
-          <div className="hint warn">
+          <div className="hint warn" aria-live="polite">
             Se superpone con {conflictText}
           </div>
         ) : (
-          <div className="hint ok">
+          <div className="hint ok" aria-live="polite">
             <Icon name="check" size={16} />
             Horario libre{nextAfter ? ` · el siguiente es a las ${nextAfter.start}` : ''}
           </div>
@@ -291,7 +291,7 @@ export default function AppointmentForm({ id, params }) {
               <span>Duración</span>
               <div className="chip-grid five">
                 {DURATIONS.map((m) => (
-                  <button key={m} className={f.duration === m ? 'chip-lg on' : 'chip-lg'} onClick={() => set('duration', m)}>
+                  <button key={m} className={f.duration === m ? 'chip-lg on' : 'chip-lg'} aria-pressed={f.duration === m} onClick={() => set('duration', m)}>
                     {m === 90 ? '1 h 30' : durationLabel(m)}
                   </button>
                 ))}
@@ -302,7 +302,7 @@ export default function AppointmentForm({ id, params }) {
               <span>Motivo</span>
               <div className="chip-grid two">
                 {TYPES.map((t) => (
-                  <button key={t.id} className="chip-type" onClick={() => set('type', t.id)}
+                  <button key={t.id} className="chip-type" aria-pressed={f.type === t.id} onClick={() => set('type', t.id)}
                     style={{ borderColor: f.type === t.id ? t.color : 'transparent', background: f.type === t.id ? t.bg : '#FFFFFF' }}>
                     <span className="type-dot" style={{ background: t.color }} />{t.label}
                   </button>
@@ -315,7 +315,7 @@ export default function AppointmentForm({ id, params }) {
         <label className="field"><span>Nota (opcional)</span>
           <textarea rows={2} value={f.notes || ''} onChange={(e) => set('notes', e.target.value)} /></label>
 
-        {error && <div className="error">{error}</div>}
+        {error && <div className="error" role="alert">{error}</div>}
         <button className="btn primary block big" onClick={save} disabled={saving}>
           {saving ? 'Guardando…' : isBlock ? 'Guardar bloqueo' : 'Guardar turno'}
         </button>

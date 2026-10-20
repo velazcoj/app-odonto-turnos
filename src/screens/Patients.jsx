@@ -115,7 +115,7 @@ export default function Patients() {
                       : [p.insurance, p.phone].filter(Boolean).join(' · ') || fullName(p)}
                   </span>
                 </span>
-                <Icon name="chevronRight" size={18} stroke={2.2} style={{ color: '#9AA9A7' }} />
+                <Icon name="chevronRight" size={18} stroke={2.2} style={{ color: '#9AA4AD' }} />
               </a>
             ))}
           </div>

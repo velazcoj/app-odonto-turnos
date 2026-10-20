@@ -1,12 +1,25 @@
 // Números argentinos → formato internacional para WhatsApp (549 + área + número, sin 0 ni 15).
+// En Argentina característica + número local = 10 dígitos, y las características empiezan con 1, 2 o 3.
 
-export function waNumber(phone) {
-  let d = String(phone || '').replace(/\D/g, '');
-  if (!d) return '';
-  if (d.startsWith('549')) return d;
-  if (d.startsWith('54')) d = d.slice(2);
+// Varios números o un interno en el mismo campo: "11 5555 0142 / 4444-1234", "… int. 23", "Celu o fijo: …".
+const SEPARATORS = /\s*(?:[/,;]|\s[oy]\s|\b(?:interno|int|ext)\.?(?=[\s\d]|$))\s*/i;
+const parts = (phone) => String(phone || '').split(SEPARATORS).filter((p) => /\d/.test(p));
+
+function waOne(raw) {
+  const s = raw.replace(/^[^\d+]+/, ''); // "cel: +54…" → "+54…"
+  let d = s.replace(/\D/g, '');
+  const intl = s.startsWith('+') || d.startsWith('00');
+  if (d.startsWith('00')) d = d.slice(2); // prefijo internacional 00
+  // Con + o 00 y otro país: tal cual. Salvo un '+' de más delante de un número nacional
+  // (10 dígitos que empiezan con 1-3, o con 0): ningún prefijo de la zona da ese largo.
+  if (intl && !d.startsWith('54') && !d.startsWith('0') && !(d.length === 10 && /^[1-3]/.test(d))) {
+    return d.length >= 8 && d.length <= 15 ? d : '';
+  }
+  if (d.startsWith('54') && d.length >= 11) d = d.slice(2); // ningún número nacional de 10 empieza con 5
+  if (d.startsWith('9') && d.length >= 11) d = d.slice(1); // ni con 9 (el 9 es el indicador móvil)
   if (d.startsWith('0')) d = d.slice(1);
-  // Si lo cargaron con el 15 (ej. 11 15 5555 0142 → 12 dígitos), sacarlo.
+  // Con el 15 (ej. 11 15 5555 0142 → 12 dígitos): está en la posición = largo del área (2, 3 o 4).
+  // Con área de 3 dígitos d[2..3] nunca es '15'; con 4, solo si el área termina en 15 y da lo mismo.
   if (d.length === 12) {
     for (const pos of [2, 3, 4]) {
       if (d.slice(pos, pos + 2) === '15') {
@@ -15,7 +28,16 @@ export function waNumber(phone) {
       }
     }
   }
-  return '549' + d;
+  // Sin característica ("15 5555 0142", "5555-0142") o con dígitos de más: mejor sin link que uno roto.
+  return d.length === 10 && /^[1-3]/.test(d) && !d.startsWith('15') ? '549' + d : '';
+}
+
+export function waNumber(phone) {
+  for (const p of parts(phone)) {
+    const n = waOne(p);
+    if (n) return n;
+  }
+  return '';
 }
 
 export function waLink(phone, text) {

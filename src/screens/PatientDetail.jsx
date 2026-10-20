@@ -11,6 +11,19 @@ import { waLink, telLink } from '../lib/phone.js';
 
 const ts = (v) => (v?.toDate ? v.toDate() : typeof v === 'number' ? new Date(v) : null);
 
+// Fuera de PatientDetail: definida adentro, cada re-render (el tick de 30 s) desmontaba y volvía a crear las filas.
+function ApptRow({ ap, today, onSelect }) {
+  return (
+    <button className="list-row" onClick={() => onSelect(ap.id)}>
+      <span className="col gap2 grow">
+        <span className="appt-name">{ap.date === today ? 'Hoy' : formatShort(ap.date)} · {ap.start}</span>
+        <TypeLabel type={ap.type} />
+      </span>
+      <StatusBadge status={ap.status} />
+    </button>
+  );
+}
+
 export default function PatientDetail({ id }) {
   useMinuteTick();
   const { patientsById, patients } = useApp();
@@ -50,16 +63,6 @@ export default function PatientDetail({ id }) {
     ['N° afiliado', p.memberNumber],
     ['Email', p.email],
   ].filter(([, v]) => v);
-
-  const ApptRow = ({ ap }) => (
-    <button className="list-row" onClick={() => setSel(ap.id)}>
-      <span className="col gap2 grow">
-        <span className="appt-name">{ap.date === today ? 'Hoy' : formatShort(ap.date)} · {ap.start}</span>
-        <TypeLabel type={ap.type} />
-      </span>
-      <StatusBadge status={ap.status} />
-    </button>
-  );
 
   return (
     <div className="screen">
@@ -102,14 +105,14 @@ export default function PatientDetail({ id }) {
       {upcoming.length > 0 && (
         <>
           <SectionTitle>Próximos turnos</SectionTitle>
-          <div className="card list">{upcoming.map((ap) => <ApptRow key={ap.id} ap={ap} />)}</div>
+          <div className="card list">{upcoming.map((ap) => <ApptRow key={ap.id} ap={ap} today={today} onSelect={setSel} />)}</div>
         </>
       )}
 
       <SectionTitle>Turnos anteriores</SectionTitle>
       {appts === null ? <div className="loading">Cargando…</div> : pastList.length === 0
         ? <div className="muted pad">Todavía no tiene turnos anteriores.</div>
-        : <div className="card list">{pastList.slice(0, 30).map((ap) => <ApptRow key={ap.id} ap={ap} />)}</div>}
+        : <div className="card list">{pastList.slice(0, 30).map((ap) => <ApptRow key={ap.id} ap={ap} today={today} onSelect={setSel} />)}</div>}
 
       <div style={{ height: 40 }} />
       {selAppt && <AppointmentSheet appt={selAppt} onClose={() => setSel(null)} />}

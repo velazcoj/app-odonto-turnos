@@ -6,10 +6,9 @@ import { useApp } from '../context.js';
 import { back, navigate } from '../lib/router.js';
 import { usePatientAppointments } from '../lib/hooks.js';
 import { hasEnded } from '../lib/dates.js';
-import { INSURANCES, findDuplicate, duplicateQuestion } from '../lib/constants.js';
+import { INSURANCES, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
 
 const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
-const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
 
 export default function PatientForm({ id }) {
   const { patients, patientsById } = useApp();
@@ -84,9 +83,9 @@ function PatientFields({ id, existing }) {
       <div className="form">
         <div className="field-row">
           <label className="field"><span>Nombre *</span>
-            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoFocus={!id} /></label>
+            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoCapitalize="words" autoFocus={!id} /></label>
           <label className="field"><span>Apellido *</span>
-            <input value={f.lastName} onChange={set('lastName')} autoComplete="off" /></label>
+            <input value={f.lastName} onChange={set('lastName')} autoComplete="off" autoCapitalize="words" /></label>
         </div>
         <label className="field"><span>Celular</span>
           <input type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} placeholder="11 5555 0142" />

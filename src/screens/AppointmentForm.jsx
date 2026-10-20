@@ -5,7 +5,7 @@ import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { back, navigate, currentRoute } from '../lib/router.js';
-import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName, findDuplicate, duplicateQuestion } from '../lib/constants.js';
+import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
 // Fin de un bloqueo: "24:30" no es una hora válida para el input, cortar a las 23:59.
@@ -46,7 +46,7 @@ function PatientPicker({ open, onClose, onPick }) {
 
   const create = async () => {
     if (!np.firstName.trim() || !np.lastName.trim()) return;
-    const data = { firstName: np.firstName.trim(), lastName: np.lastName.trim(), phone: np.phone.trim() };
+    const data = { firstName: cap(np.firstName.trim()), lastName: cap(np.lastName.trim()), phone: np.phone.trim() };
     const dup = findDuplicate(patients, data);
     if (dup && !window.confirm(duplicateQuestion(dup))) return;
     setSaving(true);
@@ -90,9 +90,9 @@ function PatientPicker({ open, onClose, onPick }) {
           <div className="sheet-title">Nuevo paciente</div>
           <div className="field-row">
             <label className="field"><span>Nombre</span>
-              <input value={np.firstName} onChange={(e) => setNp({ ...np, firstName: e.target.value })} autoFocus /></label>
+              <input value={np.firstName} onChange={(e) => setNp({ ...np, firstName: e.target.value })} autoCapitalize="words" autoFocus /></label>
             <label className="field"><span>Apellido</span>
-              <input value={np.lastName} onChange={(e) => setNp({ ...np, lastName: e.target.value })} /></label>
+              <input value={np.lastName} onChange={(e) => setNp({ ...np, lastName: e.target.value })} autoCapitalize="words" /></label>
           </div>
           <label className="field"><span>Celular</span>
             <input type="tel" inputMode="tel" value={np.phone} onChange={(e) => setNp({ ...np, phone: e.target.value })} placeholder="11 5555 0142" />

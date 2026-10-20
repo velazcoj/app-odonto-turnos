@@ -36,6 +36,9 @@ export function fillTemplate(tpl, { nombre, dia, hora }) {
     .replaceAll('{hora}', hora || '');
 }
 
+// Primera letra de cada palabra en mayúscula ("maría josé" → "María José"); el resto queda como se escribió.
+export const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
+
 // "Lucía Fernández" a partir del paciente
 export const fullName = (p) => (p ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '');
 // Nombre a mostrar en un turno: el del paciente actual; el guardado en el turno queda de respaldo

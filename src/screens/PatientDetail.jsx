@@ -37,7 +37,7 @@ export default function PatientDetail({ id }) {
   const pastList = list.filter(hasEnded);
   const visits = pastList.filter((a) => a.status === 'asistio').length;
   // "Dar turno" repite motivo y duración del último turno (el último que pasó, si no el próximo).
-  const last = pastList.find((a) => a.type) || list.find((a) => a.type);
+  const last = pastList.find((a) => a.type) || upcoming.find((a) => a.type);
   const newAppt = `/turno/nuevo?paciente=${id}${last ? `&tipo=${last.type}&duracion=${last.duration || 30}` : ''}`;
   const a = age(p.birthDate);
   const selAppt = sel && list.find((x) => x.id === sel);

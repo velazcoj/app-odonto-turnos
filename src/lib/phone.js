@@ -2,11 +2,13 @@
 // En Argentina característica + número local = 10 dígitos, y las características empiezan con 1, 2 o 3.
 
 // Varios números o un interno en el mismo campo: "11 5555 0142 / 4444-1234", "… int. 23", "Celu o fijo: …".
-const SEPARATORS = /\s*(?:[/,;]|\s[oy]\s|\b(?:interno|int|ext)\.?(?=[\s\d]|$))\s*/i;
-const parts = (phone) => String(phone || '').split(SEPARATORS).filter((p) => /\d/.test(p));
+const SEPARATORS = /\s*(?:[/,;]|\s[oóy]\s|\b(?:interno|int|ext)[.:]?(?=[\s\d]|$))\s*/i;
+// Sin el texto de alrededor: "cel: +54…" → "+54…", "… después de las 20" / "… (18 hs)" → solo el número
+// (si no, esos dígitos se sumaban y podían armar el número válido de otra persona).
+const cleanPart = (p) => p.replace(/^[^\d+]+/, '').replace(/\s*\p{L}.*$/u, '').replace(/\s*\([^)]*$/, '');
+const parts = (phone) => String(phone || '').split(SEPARATORS).map(cleanPart).filter((p) => /\d/.test(p));
 
-function waOne(raw) {
-  const s = raw.replace(/^[^\d+]+/, ''); // "cel: +54…" → "+54…"
+function waOne(s) {
   let d = s.replace(/\D/g, '');
   const intl = s.startsWith('+') || d.startsWith('00');
   if (d.startsWith('00')) d = d.slice(2); // prefijo internacional 00

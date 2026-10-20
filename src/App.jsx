@@ -15,19 +15,21 @@ export default function App() {
   const [user, setUser] = useState(undefined); // undefined = verificando
   const [patients, setPatients] = useState(null);
   const [settings, setSettings] = useState({});
+  const [settingsReady, setSettingsReady] = useState(false);
   const route = useRoute();
 
   useEffect(() => store.onAuth(setUser), []);
 
   useEffect(() => {
-    if (!user) { setPatients(null); return undefined; }
+    if (!user) { setPatients(null); setSettingsReady(false); return undefined; }
     const u1 = store.watchPatients(setPatients);
-    const u2 = store.watchSettings(setSettings);
+    const u2 = store.watchSettings((s) => { setSettings(s); setSettingsReady(true); });
     return () => { u1(); u2(); };
   }, [user]);
 
   const patientsById = useMemo(() => Object.fromEntries((patients || []).map((p) => [p.id, p])), [patients]);
-  const ctx = useMemo(() => ({ user, patients, patientsById, settings }), [user, patients, patientsById, settings]);
+  const ctx = useMemo(() => ({ user, patients, patientsById, settings, settingsReady }),
+    [user, patients, patientsById, settings, settingsReady]);
 
   if (user === undefined) return <div className="splash" />;
   if (!user) return <Login />;

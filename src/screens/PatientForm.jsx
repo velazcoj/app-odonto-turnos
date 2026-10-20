@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TopBar } from '../components/ui.jsx';
+import { TopBar, Empty } from '../components/ui.jsx';
 import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
@@ -10,8 +10,23 @@ const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', 
 const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
 
 export default function PatientForm({ id }) {
-  const { patientsById } = useApp();
-  const existing = id ? patientsById[id] : null;
+  const { patients, patientsById } = useApp();
+  // El formulario toma los datos una sola vez: si se abre antes de que lleguen los pacientes
+  // (recarga en esta pantalla) quedaría vacío y al guardar borraría teléfono, DNI, etc.
+  if (id && !patientsById[id]) {
+    return (
+      <div className="screen">
+        <TopBar left={<button type="button" className="link-btn muted" onClick={() => back(`/paciente/${id}`)}>Cancelar</button>} />
+        {patients === null ? <div className="loading">Cargando…</div>
+          : <Empty icon="user" title="Paciente no encontrado" text="Puede que se haya eliminado." />}
+      </div>
+    );
+  }
+  return <PatientFields id={id} existing={id ? patientsById[id] : null} />;
+}
+
+// Editar o crear lo decide el id de la ruta, no si el paciente está cargado.
+function PatientFields({ id, existing }) {
   const [f, setF] = useState(() => ({ ...EMPTY, ...(existing || {}) }));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -31,8 +46,8 @@ export default function PatientForm({ id }) {
         insurance: f.insurance.trim(), memberNumber: f.memberNumber.trim(), notes: f.notes.trim(),
       };
       delete data.createdAt; delete data.updatedAt;
-      const newId = await store.savePatient(existing ? { ...data, id } : data);
-      if (existing) back(`/paciente/${id}`);
+      const newId = await store.savePatient(id ? { ...data, id } : data);
+      if (id) back(`/paciente/${id}`);
       else navigate(`/paciente/${newId}`, { replace: true });
     } catch (err) {
       setError('No se pudo guardar. Revisá la conexión e intentá de nuevo.');
@@ -50,14 +65,14 @@ export default function PatientForm({ id }) {
     <form className="screen" onSubmit={save}>
       <TopBar
         left={<button type="button" className="link-btn muted" onClick={() => back(id ? `/paciente/${id}` : '/pacientes')}>Cancelar</button>}
-        title={existing ? 'Editar paciente' : 'Nuevo paciente'}
+        title={id ? 'Editar paciente' : 'Nuevo paciente'}
         right={<button type="submit" className="link-btn strong" disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>}
       />
 
       <div className="form">
         <div className="field-row">
           <label className="field"><span>Nombre *</span>
-            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoFocus={!existing} /></label>
+            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoFocus={!id} /></label>
           <label className="field"><span>Apellido *</span>
             <input value={f.lastName} onChange={set('lastName')} autoComplete="off" /></label>
         </div>
@@ -84,7 +99,7 @@ export default function PatientForm({ id }) {
 
         {error && <div className="error">{error}</div>}
         <button type="submit" className="btn primary block" disabled={saving}>{saving ? 'Guardando…' : 'Guardar paciente'}</button>
-        {existing && (
+        {id && (
           <button type="button" className="btn ghost danger block" onClick={remove}><Icon name="trash" size={18} />Eliminar paciente</button>
         )}
       </div>

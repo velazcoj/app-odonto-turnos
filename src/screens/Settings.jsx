@@ -6,6 +6,21 @@ import { back } from '../lib/router.js';
 import { DEFAULT_SETTINGS, fillTemplate } from '../lib/constants.js';
 
 export default function Settings() {
+  const { settingsReady } = useApp();
+  // El formulario toma los valores una sola vez: esperar a que lleguen los ajustes guardados,
+  // si no, tras una recarga mostraría los de fábrica y al guardar pisaría su plantilla.
+  if (!settingsReady) {
+    return (
+      <div className="screen">
+        <TopBar left={<BackLink label="Hoy" onClick={() => back('/hoy')} />} title="Ajustes" />
+        <div className="loading">Cargando…</div>
+      </div>
+    );
+  }
+  return <SettingsForm />;
+}
+
+function SettingsForm() {
   const { settings, user } = useApp();
   const [f, setF] = useState(() => ({ ...DEFAULT_SETTINGS, ...settings }));
   const [saved, setSaved] = useState(false);

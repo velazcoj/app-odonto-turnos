@@ -96,7 +96,7 @@ function PatientPicker({ open, onClose, onPick }) {
 }
 
 export default function AppointmentForm({ id, params }) {
-  const { patientsById, settings } = useApp();
+  const { patients, patientsById, settings } = useApp();
   const isNew = id === 'nuevo';
   const dayStart = settings.dayStart || DEFAULT_SETTINGS.dayStart;
   const initialDate = params.fecha || todayISO();
@@ -171,7 +171,8 @@ export default function AppointmentForm({ id, params }) {
   };
 
   const cancel = <button className="link-btn muted" onClick={() => back('/hoy')}>Cancelar</button>;
-  if (!loaded || loadError) {
+  // patients === null: sin la lista, un turno con ?paciente= se guardaría sin nombre.
+  if (!loaded || loadError || patients === null) {
     return (
       <div className="screen">
         <TopBar left={cancel} />

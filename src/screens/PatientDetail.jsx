@@ -11,6 +11,10 @@ import { waLink, telLink } from '../lib/phone.js';
 
 const ts = (v) => (v?.toDate ? v.toDate() : typeof v === 'number' ? new Date(v) : null);
 
+// Pacientes recién creados: el formulario navega acá antes de que llegue el snapshot con el doc nuevo.
+// Hasta entonces, "Cargando…" y no "Paciente no encontrado · Puede que se haya eliminado".
+export const justCreated = new Set();
+
 // Fuera de PatientDetail: definida adentro, cada re-render (el tick de 30 s) desmontaba y volvía a crear las filas.
 function ApptRow({ ap, today, onSelect }) {
   return (
@@ -35,12 +39,13 @@ export default function PatientDetail({ id }) {
     return (
       <div className="screen">
         <TopBar left={<BackLink label="Pacientes" onClick={() => back('/pacientes')} />} />
-        {patients === null ? <div className="loading">Cargando…</div>
+        {patients === null || justCreated.has(id) ? <div className="loading">Cargando…</div>
           : <Empty icon="user" title="Paciente no encontrado" text="Puede que se haya eliminado." />}
       </div>
     );
   }
 
+  justCreated.delete(id);
   const wa = waLink(p.phone, `Hola ${p.firstName}! `);
   const tel = telLink(p.phone);
   const since = ts(p.createdAt);

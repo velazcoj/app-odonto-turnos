@@ -28,7 +28,8 @@ if (firebaseConfig.apiKey) {
 const uid = () => auth.currentUser?.uid;
 const patientsCol = () => collection(db, 'users', uid(), 'patients');
 const apptsCol = () => collection(db, 'users', uid(), 'appointments');
-const withId = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+// 'estimate': mientras una escritura está pendiente, createdAt/updatedAt traen la hora local en vez de null.
+const withId = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
 const clean = (o) => Object.fromEntries(Object.entries(o).filter(([k, v]) => k !== 'id' && v !== undefined));
 
 // Las escrituras quedan al instante en la caché local (y se ven en pantalla), pero la promesa de

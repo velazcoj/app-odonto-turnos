@@ -69,6 +69,11 @@ export function BackLink({ label, onClick }) {
   );
 }
 
+// Safari iOS no enfoca un botón al tocarlo (activeElement queda en <body>): recordar el último control
+// tocado, en fase de captura (antes del onClick que abre la hoja), para devolverle el foco al cerrar.
+let lastTap = null;
+document.addEventListener('click', (e) => { lastTap = e.target.closest?.('button, a, [tabindex]') || null; }, true);
+
 export function Sheet({ open, onClose, children, title }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -76,11 +81,12 @@ export function Sheet({ open, onClose, children, title }) {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     // VoiceOver: llevar el foco a la hoja (al contenedor, para no abrir el teclado) y devolverlo al cerrar.
-    const opener = document.activeElement;
+    const active = document.activeElement;
+    const opener = active && active !== document.body ? active : lastTap;
     ref.current?.focus({ preventScroll: true });
     return () => {
       document.body.style.overflow = prev;
-      opener?.focus?.({ preventScroll: true });
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
   }, [open]);
   if (!open) return null;

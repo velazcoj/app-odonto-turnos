@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import store from './data/store.js';
+import Icon from './components/Icon.jsx';
 import { AppCtx } from './context.js';
 import { useRoute } from './lib/router.js';
 import Login from './screens/Login.jsx';
@@ -33,7 +34,7 @@ export default function App() {
     [user, patients, patientsById, settings, settingsReady]);
 
   if (loadError) throw loadError; // lo muestra el ErrorBoundary de main.jsx
-  if (user === undefined) return <div className="splash" />;
+  if (user === undefined) return <div className="splash"><div className="login-logo"><Icon name="tooth" size={38} stroke={1.8} /></div></div>;
   if (!user) return <Login />;
 
   const [a, b, c] = route.parts;

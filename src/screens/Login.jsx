@@ -45,8 +45,11 @@ export default function Login() {
 
   return (
     <form className="screen login" onSubmit={submit}>
-      <div className="login-logo"><Icon name="calendar" size={34} /></div>
-      <h1>Turnos</h1>
+      <div className="login-logo"><Icon name="tooth" size={38} stroke={1.8} /></div>
+      <h1 className="login-brand">
+        <span className="brand-name">GONZALEZ</span>
+        <span className="brand-sub">ODONTOLOGÍA INTEGRAL</span>
+      </h1>
       <div className="muted center">Ingresá para ver tu agenda</div>
       <div className="form">
         <label className="field"><span>Email</span>

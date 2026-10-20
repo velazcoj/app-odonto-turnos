@@ -40,7 +40,7 @@ h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
 #root { max-width: 560px; margin: 0 auto; min-height: 100vh; }
 .screen { padding: calc(var(--top) + 12px) 0 calc(var(--bottom) + 24px); min-height: 100vh; }
 .screen.with-tabs { padding-bottom: calc(var(--bottom) + 104px); }
-.splash { min-height: 100vh; background: var(--bg); }
+.splash { min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; }
 .demo-banner { position: sticky; top: 0; z-index: 40; background: #FEF3C7; color: #78350F; font-size: 12px; font-weight: 700; text-align: center; padding: calc(var(--top) + 4px) 8px 4px; }
 .demo-banner + .screen { padding-top: 12px; }
 
@@ -287,7 +287,10 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .empty-text { color: var(--muted); font-size: 15px; margin-bottom: 6px; }
 .login { display: flex; flex-direction: column; align-items: center; padding-top: calc(var(--top) + 80px); gap: 6px; }
 .login .form { width: 100%; margin-top: 24px; }
-.login-logo { width: 72px; height: 72px; border-radius: 22px; background: var(--brand); color: var(--mint); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.login-logo { width: 76px; height: 76px; border-radius: 24px; background: var(--brand); color: var(--mint); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(11, 13, 16, 0.18); }
+.login-brand { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 4px 0 8px; font-size: inherit; line-height: 1.15; }
+.login-brand .brand-name { font-family: var(--font-logo); font-size: 24px; font-weight: 600; letter-spacing: 5px; color: var(--ink); }
+.login-brand .brand-sub { font-family: var(--font-logo); font-size: 11px; letter-spacing: 2.6px; color: var(--blue); }
 
 @keyframes fade { from { opacity: 0; } }
 @keyframes up { from { transform: translateY(40px); opacity: 0.6; } }

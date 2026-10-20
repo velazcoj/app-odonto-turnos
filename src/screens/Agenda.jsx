@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TabBar, StatusBadge } from '../components/ui.jsx';
+import { TabBar, StatusBadge, TypeIcon } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
 import { useAppointments, useMinuteTick } from '../lib/hooks.js';
@@ -126,7 +126,7 @@ export default function Agenda({ params }) {
                 <div key={a.id} className="tl-row">
                   <span className="tl-time">{a.start}</span>
                   <button className="tl-card block" onClick={() => setSelId(a.id)}>
-                    {a.label || 'Bloqueado'} · {durationLabel(a.duration)}
+                    <span className="row gap8"><Icon name="lock" size={18} stroke={1.8} />{a.label || 'Bloqueado'} · {durationLabel(a.duration)}</span>
                   </button>
                 </div>
               );
@@ -135,8 +135,9 @@ export default function Agenda({ params }) {
             return (
               <div key={a.id} className={`tl-row${a.status === 'cancelado' ? ' cancelled' : ''}`}>
                 <span className="tl-time">{a.start}</span>
-                <button className="tl-card" style={{ background: t.bg, color: t.ink }} onClick={() => setSelId(a.id)}>
-                  <span className="col gap3">
+                <button className="tl-card" onClick={() => setSelId(a.id)}>
+                  <TypeIcon type={a.type} size={40} variant="tint" />
+                  <span className="col gap2 grow">
                     <span className="tl-name">{apptName(a, patientsById)}</span>
                     <span className="tl-sub" style={{ color: t.color }}>{t.label} · {durationLabel(a.duration || 30)}</span>
                   </span>

@@ -63,7 +63,7 @@ function PatientFields({ id, existing }) {
   const remove = async () => {
     if (!window.confirm(`¿Eliminar a ${existing.firstName} ${existing.lastName}?`)) return;
     // Los turnos que ya pasaron quedan como historial; los próximos, si ella quiere, se borran también.
-    const upcoming = (appts || []).filter((a) => !hasEnded(a) && a.status !== 'cancelado');
+    const upcoming = (appts || []).filter((a) => !hasEnded(a));
     const n = upcoming.length;
     const alsoAppts = n > 0 && window.confirm(n === 1
       ? 'Tiene 1 turno próximo. ¿Borrarlo también?'

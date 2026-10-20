@@ -96,8 +96,12 @@ export async function savePatient(p) {
   return ref.id;
 }
 
-export async function deletePatient(id) {
-  send(deleteDoc(doc(patientsCol(), id)));
+// Borra al paciente y, si se pide, algunos de sus turnos (los próximos), todo junto.
+export async function deletePatient(id, apptIds = []) {
+  const batch = writeBatch(db);
+  batch.delete(doc(patientsCol(), id));
+  apptIds.forEach((a) => batch.delete(doc(apptsCol(), a)));
+  send(batch.commit());
 }
 
 export function watchAppointmentsRange(from, to, cb, onError) {

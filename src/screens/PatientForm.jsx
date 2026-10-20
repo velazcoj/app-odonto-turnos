@@ -4,6 +4,8 @@ import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { back, navigate } from '../lib/router.js';
+import { usePatientAppointments } from '../lib/hooks.js';
+import { hasEnded } from '../lib/dates.js';
 import { INSURANCES, findDuplicate, duplicateQuestion } from '../lib/constants.js';
 
 const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
@@ -28,6 +30,7 @@ export default function PatientForm({ id }) {
 // Editar o crear lo decide el id de la ruta, no si el paciente está cargado.
 function PatientFields({ id, existing }) {
   const { patients } = useApp();
+  const appts = usePatientAppointments(id);
   const [f, setF] = useState(() => ({ ...EMPTY, ...(existing || {}) }));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -59,8 +62,14 @@ function PatientFields({ id, existing }) {
   };
 
   const remove = async () => {
-    if (!window.confirm(`¿Eliminar a ${existing.firstName} ${existing.lastName}? Sus turnos quedan en la agenda.`)) return;
-    await store.deletePatient(id);
+    if (!window.confirm(`¿Eliminar a ${existing.firstName} ${existing.lastName}?`)) return;
+    // Los turnos que ya pasaron quedan como historial; los próximos, si ella quiere, se borran también.
+    const upcoming = (appts || []).filter((a) => !hasEnded(a) && a.status !== 'cancelado');
+    const n = upcoming.length;
+    const alsoAppts = n > 0 && window.confirm(n === 1
+      ? 'Tiene 1 turno próximo. ¿Borrarlo también?'
+      : `Tiene ${n} turnos próximos. ¿Borrarlos también?`);
+    await store.deletePatient(id, alsoAppts ? upcoming.map((a) => a.id) : []);
     navigate('/pacientes', { replace: true });
   };
 
@@ -103,7 +112,7 @@ function PatientFields({ id, existing }) {
         {error && <div className="error">{error}</div>}
         <button type="submit" className="btn primary block" disabled={saving}>{saving ? 'Guardando…' : 'Guardar paciente'}</button>
         {id && (
-          <button type="button" className="btn ghost danger block" onClick={remove}><Icon name="trash" size={18} />Eliminar paciente</button>
+          <button type="button" className="btn ghost danger block" onClick={remove} disabled={appts === null}><Icon name="trash" size={18} />Eliminar paciente</button>
         )}
       </div>
     </form>

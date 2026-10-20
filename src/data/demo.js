@@ -85,7 +85,11 @@ export async function savePatient(p) {
   commit();
   return id;
 }
-export const deletePatient = async (id) => { state.patients = state.patients.filter((p) => p.id !== id); commit(); };
+export const deletePatient = async (id, apptIds = []) => {
+  state.patients = state.patients.filter((p) => p.id !== id);
+  state.appointments = state.appointments.filter((a) => !apptIds.includes(a.id));
+  commit();
+};
 
 export const watchAppointmentsRange = (from, to, cb) =>
   sub(() => cb(state.appointments.filter((a) => a.date >= from && a.date <= to).map((a) => ({ ...a }))));

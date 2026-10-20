@@ -74,7 +74,7 @@ export default function AppointmentSheet({ appt, onClose }) {
             ) : <span className="action disabled"><Icon name="whatsapp" />Sin teléfono</span>}
             {tel ? <a className="action" href={tel}><Icon name="phone" />Llamar</a>
               : <span className="action disabled"><Icon name="phone" />Llamar</span>}
-            {appt.patientId && <button className="action" onClick={openPatient}><Icon name="user" />Paciente</button>}
+            {patient && <button className="action" onClick={openPatient}><Icon name="user" />Paciente</button>}
           </div>
           {appt.reminderSent && (
             <button className="hint ok" onClick={() => {

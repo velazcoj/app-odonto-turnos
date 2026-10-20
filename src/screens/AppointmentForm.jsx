@@ -120,8 +120,9 @@ export default function AppointmentForm({ id, params }) {
     patientId: params.paciente || '',
     date: initialDate,
     start: params.hora || defaultStart(initialDate, dayStart),
-    duration: 45,
-    type: 'consulta',
+    // ?duracion= y ?tipo= (p. ej. desde "Dar turno" de la ficha); solo valores conocidos.
+    duration: DURATIONS.includes(Number(params.duracion)) ? Number(params.duracion) : 45,
+    type: TYPES.some((t) => t.id === params.tipo) ? params.tipo : 'consulta',
     status: 'pendiente',
     notes: '',
     label: 'Almuerzo',

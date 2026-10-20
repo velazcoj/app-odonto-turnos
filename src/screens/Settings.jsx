@@ -1,9 +1,66 @@
 import { useState } from 'react';
 import { TopBar, BackLink, SectionTitle } from '../components/ui.jsx';
+import Icon from '../components/Icon.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { back } from '../lib/router.js';
 import { DEFAULT_SETTINGS, WEEKDAYS, fillTemplate } from '../lib/constants.js';
+import { buildBackup, shareableFiles } from '../lib/backup.js';
+
+// Copia de seguridad en dos pasos: Safari solo deja abrir la hoja de compartir en respuesta directa a un
+// toque, y si antes hay una espera de red (leer todo del servidor) la rechaza. Por eso primero se prepara
+// y después se comparte con otro toque.
+function Backup() {
+  const [state, setState] = useState({ step: 'idle' });
+  const prepare = async () => {
+    setState({ step: 'preparing' });
+    try {
+      const backup = buildBackup(await store.exportAll());
+      const files = shareableFiles(backup.parts);
+      // Sin hoja de compartir: links de descarga (creados una sola vez).
+      const downloads = files ? null : backup.parts.map((p) => ({ name: p.name, url: URL.createObjectURL(new Blob([p.text], { type: p.type })) }));
+      setState({ step: 'ready', backup, files, downloads });
+    } catch {
+      setState({ step: 'error', msg: 'Necesitás conexión para preparar la copia. Probá de nuevo con señal.' });
+    }
+  };
+  const share = async () => {
+    try {
+      await navigator.share({ files: state.files, title: 'Copia de seguridad de Turnos' });
+    } catch (e) {
+      if (e?.name !== 'AbortError') setState((s) => ({ ...s, msg: 'No se pudo compartir. Probá de nuevo.' }));
+    }
+  };
+  const { step, backup } = state;
+  return (
+    <>
+      <div className="muted small">Pacientes y turnos en un archivo JSON y dos planillas (CSV). Tiene datos personales: guardala en un lugar privado.</div>
+      {step === 'ready' ? (
+        <>
+          <div className="hint ok" aria-live="polite">
+            Lista: {backup.counts.patients} {backup.counts.patients === 1 ? 'paciente' : 'pacientes'} · {backup.counts.appointments} {backup.counts.appointments === 1 ? 'turno' : 'turnos'}
+          </div>
+          {state.files ? (
+            <button className="btn primary block" onClick={share}><Icon name="share" size={18} />Compartir copia</button>
+          ) : (
+            <div className="col gap8">
+              {state.downloads.map((d) => (
+                <a key={d.name} className="btn ghost block" download={d.name} href={d.url}>
+                  <Icon name="share" size={18} />Descargar {d.name}
+                </a>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <button className="btn ghost block" onClick={prepare} disabled={step === 'preparing'}>
+          {step === 'preparing' ? 'Preparando…' : 'Preparar copia de seguridad'}
+        </button>
+      )}
+      {(step === 'error' || state.msg) && <div className="error" role="alert">{state.msg}</div>}
+    </>
+  );
+}
 
 export default function Settings() {
   const { settingsReady } = useApp();
@@ -70,6 +127,9 @@ function SettingsForm() {
         <div className="bubble">{fillTemplate(f.reminderTemplate, { nombre: 'Lucía', dia: 'mañana', hora: '15:00' })}</div>
 
         <button className="btn primary block big" onClick={save} aria-live="polite">{saved ? 'Guardado ✓' : 'Guardar ajustes'}</button>
+
+        <SectionTitle>Copia de seguridad</SectionTitle>
+        <Backup />
 
         <SectionTitle>Cuenta</SectionTitle>
         <div className="muted small">{store.isDemo ? 'Modo demo: los datos son de ejemplo y quedan solo en este teléfono.' : `Ingresaste como ${user?.email}`}</div>

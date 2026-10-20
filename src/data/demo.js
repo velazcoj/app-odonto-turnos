@@ -115,4 +115,7 @@ export const updateAppointment = async (id, partial) => {
   st().appointments = st().appointments.map((x) => (x.id === id ? { ...x, ...partial } : x));
   commit();
 };
+export const exportAll = async () => ({
+  patients: st().patients.map((p) => ({ ...p })), appointments: st().appointments.map((a) => ({ ...a })), settings: { ...st().settings },
+});
 export const deleteAppointment = async (id) => { st().appointments = st().appointments.filter((a) => a.id !== id); commit(); };

@@ -5,7 +5,7 @@ import {
 } from 'firebase/auth';
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-  collection, doc, onSnapshot, query, where, updateDoc, deleteDoc, setDoc, getDoc, getDocFromCache, getDocs,
+  collection, doc, onSnapshot, query, where, updateDoc, deleteDoc, setDoc, getDoc, getDocFromCache, getDocs, getDocsFromServer, getDocFromServer,
   writeBatch, serverTimestamp,
 } from 'firebase/firestore';
 import { firebaseConfig } from '../firebase-config.js';
@@ -135,6 +135,14 @@ export async function saveAppointment(a) {
 export async function updateAppointment(id, partial) {
   send(updateDoc(doc(apptsCol(), id), partial));
 }
+// Copia de seguridad: todo desde el servidor (la caché puede tener solo lo que se miró). Sin conexión, falla.
+export async function exportAll() {
+  const [p, a, u] = await Promise.all([
+    getDocsFromServer(patientsCol()), getDocsFromServer(apptsCol()), getDocFromServer(doc(db, 'users', uid())),
+  ]);
+  return { patients: withId(p), appointments: withId(a), settings: u.data()?.settings || {} };
+}
+
 export async function deleteAppointment(id) {
   send(deleteDoc(doc(apptsCol(), id)));
 }

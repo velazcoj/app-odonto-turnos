@@ -1,0 +1,31 @@
+import { useEffect, useState } from 'react';
+import store from '../data/store.js';
+
+const byTime = (a, b) => (a.date + a.start).localeCompare(b.date + b.start);
+
+export function useAppointments(from, to) {
+  const [list, setList] = useState(null);
+  useEffect(() => {
+    setList(null);
+    return store.watchAppointmentsRange(from, to, (l) => setList([...l].sort(byTime)));
+  }, [from, to]);
+  return list;
+}
+
+export function usePatientAppointments(patientId) {
+  const [list, setList] = useState(null);
+  useEffect(() => {
+    if (!patientId) return undefined;
+    return store.watchPatientAppointments(patientId, (l) => setList([...l].sort(byTime).reverse()));
+  }, [patientId]);
+  return list;
+}
+
+// Re-render cada minuto (para "en 25 min", "ahora", etc.)
+export function useMinuteTick() {
+  const [, set] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => set((n) => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
+}

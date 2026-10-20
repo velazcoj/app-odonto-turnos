@@ -1,0 +1,93 @@
+import { useState } from 'react';
+import { TopBar } from '../components/ui.jsx';
+import Icon from '../components/Icon.jsx';
+import store from '../data/store.js';
+import { useApp } from '../context.js';
+import { back, navigate } from '../lib/router.js';
+import { INSURANCES } from '../lib/constants.js';
+
+const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
+const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
+
+export default function PatientForm({ id }) {
+  const { patientsById } = useApp();
+  const existing = id ? patientsById[id] : null;
+  const [f, setF] = useState(() => ({ ...EMPTY, ...(existing || {}) }));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+
+  const save = async (e) => {
+    e.preventDefault();
+    if (!f.firstName.trim() || !f.lastName.trim()) { setError('Completá nombre y apellido.'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      const data = {
+        ...f,
+        firstName: cap(f.firstName.trim()),
+        lastName: cap(f.lastName.trim()),
+        phone: f.phone.trim(), dni: f.dni.trim(), email: f.email.trim(),
+        insurance: f.insurance.trim(), memberNumber: f.memberNumber.trim(), notes: f.notes.trim(),
+      };
+      delete data.createdAt; delete data.updatedAt;
+      const newId = await store.savePatient(existing ? { ...data, id } : data);
+      if (existing) back(`/paciente/${id}`);
+      else navigate(`/paciente/${newId}`, { replace: true });
+    } catch (err) {
+      setError('No se pudo guardar. Revisá la conexión e intentá de nuevo.');
+      setSaving(false);
+    }
+  };
+
+  const remove = async () => {
+    if (!window.confirm(`¿Eliminar a ${existing.firstName} ${existing.lastName}? Sus turnos quedan en la agenda.`)) return;
+    await store.deletePatient(id);
+    navigate('/pacientes', { replace: true });
+  };
+
+  return (
+    <form className="screen" onSubmit={save}>
+      <TopBar
+        left={<button type="button" className="link-btn muted" onClick={() => back(id ? `/paciente/${id}` : '/pacientes')}>Cancelar</button>}
+        title={existing ? 'Editar paciente' : 'Nuevo paciente'}
+        right={<button type="submit" className="link-btn strong" disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>}
+      />
+
+      <div className="form">
+        <div className="field-row">
+          <label className="field"><span>Nombre *</span>
+            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoFocus={!existing} /></label>
+          <label className="field"><span>Apellido *</span>
+            <input value={f.lastName} onChange={set('lastName')} autoComplete="off" /></label>
+        </div>
+        <label className="field"><span>Celular</span>
+          <input type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} placeholder="11 5555 0142" />
+          <small>Con código de área, sin 0 ni 15. Se usa para WhatsApp.</small></label>
+        <div className="field-row">
+          <label className="field"><span>DNI</span>
+            <input inputMode="numeric" value={f.dni} onChange={set('dni')} /></label>
+          <label className="field"><span>Nacimiento</span>
+            <input type="date" value={f.birthDate} onChange={set('birthDate')} /></label>
+        </div>
+        <div className="field-row">
+          <label className="field"><span>Obra social</span>
+            <input list="insurances" value={f.insurance} onChange={set('insurance')} autoComplete="off" /></label>
+          <label className="field"><span>N° afiliado</span>
+            <input value={f.memberNumber} onChange={set('memberNumber')} /></label>
+        </div>
+        <datalist id="insurances">{INSURANCES.map((i) => <option key={i} value={i} />)}</datalist>
+        <label className="field"><span>Email</span>
+          <input type="email" inputMode="email" value={f.email} onChange={set('email')} autoCapitalize="off" /></label>
+        <label className="field"><span>Nota</span>
+          <textarea rows={3} value={f.notes} onChange={set('notes')} placeholder="Ej.: prefiere turnos a la tarde" /></label>
+
+        {error && <div className="error">{error}</div>}
+        <button type="submit" className="btn primary block" disabled={saving}>{saving ? 'Guardando…' : 'Guardar paciente'}</button>
+        {existing && (
+          <button type="button" className="btn ghost danger block" onClick={remove}><Icon name="trash" size={18} />Eliminar paciente</button>
+        )}
+      </div>
+    </form>
+  );
+}

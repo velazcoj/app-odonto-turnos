@@ -12,7 +12,7 @@ export const typeOf = (id) => TYPES.find((t) => t.id === id) || TYPES[0];
 
 export const STATUSES = [
   { id: 'pendiente', label: 'A confirmar', bg: '#EEF1F4', ink: '#475569' },
-  { id: 'confirmado', label: 'Confirmado', bg: '#CCEDE7', ink: '#0F5F58' },
+  { id: 'confirmado', label: 'Confirmado', bg: '#DDF6F1', ink: '#0B6B5F' }, // menta de la marca
   { id: 'asistio', label: 'Asistió', bg: '#DCFCE7', ink: '#166534' },
   { id: 'ausente', label: 'Ausente', bg: '#FFEDD5', ink: '#9A3412' },
   { id: 'cancelado', label: 'Canceló', bg: '#FEE2E2', ink: '#991B1B' },

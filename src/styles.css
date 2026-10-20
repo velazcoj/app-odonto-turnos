@@ -94,26 +94,58 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .btn.big { min-height: 54px; font-size: 17px; font-weight: 700; border-radius: 18px; }
 .btn.wa { background: var(--mint-soft); color: var(--mint-ink); }
 
-/* tarjeta "próximo" */
-.next-card { margin: 18px 20px 0; background: var(--brand); border-radius: 22px; padding: 18px; color: #FFF; display: flex; flex-direction: column; gap: 14px; }
-.next-info { color: #FFF; display: flex; flex-direction: column; gap: 2px; text-align: left; }
-.next-when { font-size: 13px; font-weight: 700; opacity: 0.88; text-transform: uppercase; letter-spacing: 0.8px; }
-.next-name { font-size: 22px; font-weight: 800; }
-.next-time { font-size: 15px; font-weight: 500; opacity: 0.92; }
-.next-btn { flex: 1; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
-.next-btn.solid { background: #FFF; color: #0F5F58; }
-.next-btn.outline { border: 1.5px solid rgba(255,255,255,0.7); color: #FFF; }
+/* logotipo */
+.brand { display: flex; align-items: center; gap: 10px; color: #F2F4F5; }
+.brand svg { color: var(--mint); flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+.brand-name { font-family: var(--font-logo); font-size: 14px; font-weight: 600; letter-spacing: 3.2px; }
+.brand-sub { font-family: var(--font-logo); font-size: 9px; letter-spacing: 2px; color: var(--blue-on-dark); }
+.brand.light { color: var(--ink); }
+.brand.light .brand-sub { color: var(--blue); }
 
-/* lista del día (Hoy) */
-.day-list { margin: 0 20px; display: flex; flex-direction: column; gap: 10px; }
-.day-row { display: flex; gap: 12px; align-items: stretch; width: 100%; text-align: left; }
-.day-row.past { opacity: 0.6; }
-.day-row.cancelled .appt-name { text-decoration: line-through; }
-.day-time { width: 48px; flex-shrink: 0; font-size: 15px; font-weight: 700; padding-top: 14px; }
-.day-time.accent { color: var(--mint-ink); font-weight: 800; }
-.appt-card { flex: 1; min-width: 0; background: var(--card); border-radius: 16px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.appt-card.next { box-shadow: 0 0 0 2px var(--mint-ink-2) inset; }
-.appt-card.block { border: 1.5px dashed #B9C7C4; background: transparent; color: var(--muted); font-weight: 600; font-size: 15px; }
+/* Hoy: cabecera negra */
+.screen.today { padding-top: 0; }
+.today-head { background: var(--brand); color: #F2F4F5; border-radius: 0 0 32px 32px; padding: calc(var(--top) + 14px) 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.demo-banner + .screen.today .today-head { padding-top: 12px; }
+.today-head.with-next { padding-bottom: 64px; }
+.today-date { font-size: 13px; font-weight: 600; color: #9AA4AD; white-space: nowrap; }
+.icon-btn.on-dark { color: #9AA4AD; margin-right: -10px; }
+.today-greet { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.greet-hi { font-size: 15px; color: #9AA4AD; }
+.today-head h1 { color: #F2F4F5; overflow-wrap: anywhere; }
+.ring { width: 66px; height: 66px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ring-inner { width: 52px; height: 52px; border-radius: 50%; background: var(--brand); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.ring-num { font-size: 16px; font-weight: 800; }
+.ring-label { font-size: 10px; font-weight: 600; color: #9AA4AD; }
+
+/* Hoy: tarjeta del próximo paciente, superpuesta a la cabecera */
+.next-card { position: relative; margin: -46px 20px 0; background: var(--card); border-radius: 24px; padding: 16px; box-shadow: 0 10px 30px rgba(14, 18, 22, 0.08); display: flex; flex-direction: column; gap: 14px; }
+.next-info { display: flex; gap: 12px; align-items: center; text-align: left; width: 100%; min-width: 0; }
+.next-hour { width: 56px; height: 56px; border-radius: 16px; background: var(--mint-soft); color: var(--mint-ink); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+.next-when { font-size: 12px; font-weight: 700; color: var(--mint-ink); letter-spacing: 1px; text-transform: uppercase; }
+.next-name { font-size: 20px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.next-sub { font-size: 14px; color: var(--muted); }
+.next-btn { flex: 1; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
+.next-btn.solid { background: var(--brand); color: #FFF; }
+.next-btn.solid svg { color: var(--mint); }
+.next-btn.soft { background: var(--gray-btn); color: var(--ink); font-weight: 600; }
+
+/* títulos de sección grandes (Hoy, Ficha) */
+.section-head { margin: 28px 20px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.section-head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+.section-link { font-size: 14px; font-weight: 600; color: var(--blue); padding: 12px 0; margin: -12px 0; white-space: nowrap; }
+
+/* Hoy: agenda del día como línea de tiempo */
+.day-line { margin: 0 20px; display: flex; flex-direction: column; position: relative; }
+.day-line::before { content: ''; position: absolute; left: 21px; top: 14px; bottom: 14px; width: 2px; background: var(--line); }
+.dl-row { display: flex; gap: 14px; align-items: center; padding: 8px 0; width: 100%; min-height: 60px; text-align: left; }
+.dl-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+.dl-icon.block { background: var(--bg); border: 2px dashed #C9D1D6; color: var(--muted); }
+.dl-name { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dl-row.next .dl-name { font-weight: 700; }
+.dl-row.block .dl-name { color: var(--muted); }
+.dl-row.cancelled .dl-name { text-decoration: line-through; }
+.dl-sub { font-size: 13px; color: var(--muted); }
 .appt-name { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .type-label { font-size: 13px; font-weight: 600; }
 .type-icon { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--card); position: relative; }

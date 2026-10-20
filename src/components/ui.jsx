@@ -8,6 +8,31 @@ export function StatusBadge({ status }) {
   return <span className="badge" style={{ background: s.bg, color: s.ink }}>{s.label}</span>;
 }
 
+// Logotipo de la marca: diente menta + "GONZALEZ / ODONTOLOGÍA INTEGRAL" (Josefin Sans).
+export function Brand({ size = 28, light = false }) {
+  return (
+    <div className={light ? 'brand light' : 'brand'}>
+      <Icon name="tooth" size={size} stroke={1.8} />
+      <div className="brand-text">
+        <span className="brand-name">GONZALEZ</span>
+        <span className="brand-sub">ODONTOLOGÍA INTEGRAL</span>
+      </div>
+    </div>
+  );
+}
+
+// Color de la barra de estado mientras la pantalla está montada (en standalone, iOS puede tomar
+// theme-color con el estilo "default"); al salir vuelve al fondo claro de la app.
+export function useThemeColor(color) {
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return undefined;
+    const prev = meta.getAttribute('content');
+    meta.setAttribute('content', color);
+    return () => meta.setAttribute('content', prev);
+  }, [color]);
+}
+
 // Ícono circular del motivo. variant: 'ring' (blanco con borde), 'tint' (fondo suave del motivo),
 // 'next' (negro de marca con ícono menta y halo, para el próximo turno).
 export function TypeIcon({ type, size = 44, variant = 'ring' }) {

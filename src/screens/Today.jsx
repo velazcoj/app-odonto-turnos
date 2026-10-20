@@ -1,20 +1,42 @@
 import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TabBar, StatusBadge, TypeLabel, SectionTitle, Empty } from '../components/ui.jsx';
+import { TabBar, StatusBadge, TypeLabel, TypeIcon, Empty, Brand, useThemeColor } from '../components/ui.jsx';
 import AppointmentSheet, { reminderLink } from '../components/AppointmentSheet.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments, useMinuteTick } from '../lib/hooks.js';
 import {
-  todayISO, addDays, formatLong, timeToMin, minToTime, nowMin, durationLabel, nextWorkDay, dayName, dayShort,
+  todayISO, addDays, formatShort, timeToMin, nowMin, durationLabel, nextWorkDay, dayName, dayShort,
 } from '../lib/dates.js';
 import { telLink } from '../lib/phone.js';
-import { apptName, DEFAULT_SETTINGS } from '../lib/constants.js';
+import { apptName, typeOf, DEFAULT_SETTINGS } from '../lib/constants.js';
 
 const active = (a) => a.kind !== 'bloqueo' && a.status !== 'cancelado' && a.status !== 'ausente';
 
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buenos días';
+  if (h < 20) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+// Anillo de progreso: atendidos / turnos del día (sin cancelados ni bloqueos).
+function Progress({ done, total }) {
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return (
+    <div className="ring" role="img" aria-label={`${done} de ${total} turnos atendidos`}
+      style={{ background: `conic-gradient(var(--mint) 0 ${pct}%, #232A31 ${pct}% 100%)` }}>
+      <div className="ring-inner" aria-hidden="true">
+        <span className="ring-num">{done}/{total}</span>
+        <span className="ring-label">listos</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Today() {
   useMinuteTick();
+  useThemeColor('#0B0D10');
   const { patientsById, settings } = useApp();
   const today = todayISO();
   const tomorrow = addDays(today, 1);
@@ -29,7 +51,8 @@ export default function Today() {
   const severalDays = tomorrows.some((a) => a.date !== remDate);
   const remTitle = remDate === tomorrow && !severalDays ? 'Recordatorios para mañana'
     : `Recordatorios ${severalDays ? 'hasta' : 'para'} el ${dayName(remDate).toLowerCase()}`;
-  const count = todays.filter((a) => a.kind !== 'bloqueo' && a.status !== 'cancelado').length;
+  const turnos = todays.filter((a) => a.kind !== 'bloqueo' && a.status !== 'cancelado');
+  const done = turnos.filter((a) => a.status === 'asistio').length;
   const now = nowMin();
   // El que ya se marcó "Asistió" no es el próximo, aunque su horario no haya terminado.
   const next = todays.find((a) => active(a) && a.status !== 'asistio' && timeToMin(a.start) + (a.duration || 30) > now);
@@ -42,37 +65,46 @@ export default function Today() {
     else if (diff < 60) when = `En ${diff} min`;
     else when = `En ${Math.floor(diff / 60)} h ${diff % 60 ? `${diff % 60} min` : ''}`.trim();
   }
+  const nextWa = next && reminderLink(next, patientsById[next.patientId], settings);
+  const nextTel = next && telLink(patientsById[next.patientId]?.phone || next.patientPhone);
 
   return (
-    <div className="screen with-tabs">
-      <header className="page-head">
-        <div className="eyebrow">{formatLong(today)}</div>
+    <div className="screen with-tabs today">
+      <header className={next ? 'today-head with-next' : 'today-head'}>
         <div className="row-between">
-          <h1>Hoy</h1>
-          <div className="row gap8">
-            <span className="pill">{count} {count === 1 ? 'turno' : 'turnos'}</span>
-            <a className="icon-btn" href="#/ajustes" aria-label="Ajustes"><Icon name="settings" /></a>
+          <Brand />
+          <div className="row">
+            <span className="today-date">{formatShort(today)}</span>
+            <a className="icon-btn on-dark" href="#/ajustes" aria-label="Ajustes"><Icon name="settings" /></a>
           </div>
+        </div>
+        <div className="today-greet">
+          <div className="col gap2">
+            <div className="greet-hi">{greeting()},</div>
+            <h1>{settings.displayName || DEFAULT_SETTINGS.displayName}</h1>
+          </div>
+          {turnos.length > 0 && <Progress done={done} total={turnos.length} />}
         </div>
       </header>
 
       {next && (
         <div className="next-card">
           <button className="next-info" onClick={() => setSel(next.id)}>
-            <div className="next-when">Próximo · {when}</div>
-            <div className="next-name">{apptName(next, patientsById)}</div>
-            <div className="next-time">
-              {next.start} – {minToTime(timeToMin(next.start) + (next.duration || 30))} · {durationLabel(next.duration || 30)}
-            </div>
+            <span className="next-hour">{next.start}</span>
+            <span className="col gap2 grow">
+              <span className="next-when">Próximo · {when}</span>
+              <span className="next-name">{apptName(next, patientsById)}</span>
+              <span className="next-sub">{typeOf(next.type).label} · {durationLabel(next.duration || 30)}</span>
+            </span>
           </button>
           <div className="row gap10">
-            {reminderLink(next, patientsById[next.patientId], settings) && (
-              <a className="next-btn solid" target="_blank" rel="noreferrer" href={reminderLink(next, patientsById[next.patientId], settings)}>
+            {nextWa && (
+              <a className="next-btn solid" target="_blank" rel="noreferrer" href={nextWa}>
                 <Icon name="whatsapp" size={18} />WhatsApp
               </a>
             )}
-            {telLink(patientsById[next.patientId]?.phone || next.patientPhone) && (
-              <a className="next-btn outline" href={telLink(patientsById[next.patientId]?.phone || next.patientPhone)}>
+            {nextTel && (
+              <a className="next-btn soft" href={nextTel}>
                 <Icon name="phone" size={18} />Llamar
               </a>
             )}
@@ -80,33 +112,38 @@ export default function Today() {
         </div>
       )}
 
-      <SectionTitle>Turnos del día</SectionTitle>
+      <div className="section-head">
+        <h2>Agenda de hoy</h2>
+        <a className="section-link" href={`#/agenda?fecha=${today}`}>Ver semana</a>
+      </div>
       {list === null ? <div className="loading">Cargando…</div> : todays.length === 0 ? (
         <Empty icon="calendar" title="Día libre" text="No hay turnos cargados para hoy."
           action={<a className="btn primary" href={`#/turno/nuevo?fecha=${today}`}>Dar un turno</a>} />
       ) : (
-        <div className="day-list">
+        <div className="day-line">
           {todays.map((a) => {
             const past = timeToMin(a.start) + (a.duration || 30) <= now;
-            const isNext = next && a.id === next.id;
             if (a.kind === 'bloqueo') {
               return (
-                <button key={a.id} className="day-row" onClick={() => setSel(a.id)}>
-                  <span className="day-time muted">{a.start}</span>
-                  <span className="appt-card block">{a.label || 'Bloqueado'} · {durationLabel(a.duration)}</span>
+                <button key={a.id} className={`dl-row block${past ? ' past' : ''}`} onClick={() => setSel(a.id)}>
+                  <span className="dl-icon block"><Icon name="lock" size={18} stroke={1.8} /></span>
+                  <span className="col gap2 grow">
+                    <span className="dl-name">{a.label || 'Bloqueado'}</span>
+                    <span className="dl-sub"><span className="dl-time">{a.start}</span> · {durationLabel(a.duration)}</span>
+                  </span>
                 </button>
               );
             }
+            const isNext = next && a.id === next.id;
+            const cls = ['dl-row', past && 'past', a.status === 'cancelado' && 'cancelled', isNext && 'next'].filter(Boolean).join(' ');
             return (
-              <button key={a.id} className={`day-row${past ? ' past' : ''}${a.status === 'cancelado' ? ' cancelled' : ''}`} onClick={() => setSel(a.id)}>
-                <span className={`day-time${isNext ? ' accent' : ''}`}>{a.start}</span>
-                <span className={`appt-card${isNext ? ' next' : ''}`}>
-                  <span className="col gap3">
-                    <span className="appt-name">{apptName(a, patientsById)}</span>
-                    <TypeLabel type={a.type} />
-                  </span>
-                  <StatusBadge status={a.status} />
+              <button key={a.id} className={cls} onClick={() => setSel(a.id)}>
+                <TypeIcon type={a.type} variant={isNext ? 'next' : 'ring'} />
+                <span className="col gap2 grow">
+                  <span className="dl-name">{apptName(a, patientsById)}</span>
+                  <span className="dl-sub"><span className="dl-time">{a.start}</span> · {typeOf(a.type).label}</span>
                 </span>
+                <StatusBadge status={a.status} />
               </button>
             );
           })}
@@ -115,13 +152,16 @@ export default function Today() {
 
       {tomorrows.length > 0 && (
         <>
-          <SectionTitle>{remTitle}</SectionTitle>
+          <div className="section-head">
+            <h2>{remTitle}</h2>
+          </div>
           <div className="card list">
             {tomorrows.map((a) => {
               const link = reminderLink(a, patientsById[a.patientId], settings);
               return (
                 <div key={a.id} className="list-row">
-                  <div className="col gap3 grow">
+                  <TypeIcon type={a.type} size={40} variant="tint" />
+                  <div className="col gap2 grow">
                     <span className="appt-name">{apptName(a, patientsById)}</span>
                     <span className="muted small">{severalDays && `${dayShort(a.date)} `}{a.start} · <TypeLabel type={a.type} /></span>
                   </div>

@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { TabBar, Avatar, Empty } from '../components/ui.jsx';
 import { useApp } from '../context.js';
 import { norm, fullName } from '../lib/constants.js';
 import { parseISO } from '../lib/dates.js';
+import { savedScroll } from '../lib/router.js';
 
 const FILTERS = [
   { id: 'todos', label: 'Todos' },
@@ -11,12 +12,24 @@ const FILTERS = [
   { id: 'cumple', label: 'Cumplen este mes' },
 ];
 
+// La pantalla se desmonta al abrir una ficha: búsqueda y filtro quedan acá para cuando vuelva.
+let lastQ = '';
+let lastFilter = 'todos';
+
 const ts = (v) => (v?.toMillis ? v.toMillis() : typeof v === 'number' ? v : 0);
 
 export default function Patients() {
   const { patients } = useApp();
-  const [q, setQ] = useState('');
-  const [filter, setFilter] = useState('todos');
+  const [q, setQState] = useState(lastQ);
+  const [filter, setFilterState] = useState(lastFilter);
+  const setQ = (v) => { lastQ = v; setQState(v); };
+  const setFilter = (v) => { lastFilter = v; setFilterState(v); };
+
+  // Volver a la posición en la lista (la lista ya está completa en el primer render).
+  useLayoutEffect(() => {
+    const y = savedScroll('/pacientes');
+    if (y && patients) window.scrollTo(0, y);
+  }, []);
 
   const filtered = useMemo(() => {
     let l = patients || [];

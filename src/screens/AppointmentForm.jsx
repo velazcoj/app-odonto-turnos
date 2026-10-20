@@ -28,7 +28,7 @@ function PatientPicker({ open, onClose, onPick }) {
 
   const list = useMemo(() => {
     const nq = norm(q);
-    const l = (patients || []).filter((p) => !nq || nq.split(/\s+/).every((w) => norm(`${p.firstName} ${p.lastName} ${p.dni}`).includes(w)));
+    const l = (patients || []).filter((p) => !nq || nq.split(/\s+/).every((w) => norm([p.firstName, p.lastName, p.dni].filter(Boolean).join(' ')).includes(w)));
     return l.sort((a, b) => norm(a.lastName + a.firstName).localeCompare(norm(b.lastName + b.firstName))).slice(0, 50);
   }, [patients, q]);
 

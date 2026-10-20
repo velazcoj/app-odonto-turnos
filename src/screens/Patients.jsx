@@ -37,7 +37,8 @@ export default function Patients() {
     if (nq) {
       const words = nq.split(/\s+/);
       l = l.filter((p) => {
-        const hay = norm(`${p.firstName} ${p.lastName} ${p.dni} ${p.phone} ${p.insurance}`);
+        // filter(Boolean): un campo que no existe no tiene que volverse el texto "undefined".
+        const hay = norm([p.firstName, p.lastName, p.dni, p.phone, p.insurance].filter(Boolean).join(' '));
         const digits = (p.dni || '').replace(/\D/g, '') + ' ' + (p.phone || '').replace(/\D/g, '');
         return words.every((w) => hay.includes(w) || (/^\d+$/.test(w) && digits.includes(w)));
       });

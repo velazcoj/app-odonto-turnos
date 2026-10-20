@@ -145,6 +145,10 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .dl-row.next .dl-name { font-weight: 700; }
 .dl-row.block .dl-name { color: var(--muted); }
 .dl-row.cancelled .dl-name { text-decoration: line-through; }
+/* M12 en Hoy: el ícono y la hora se atenúan y el nombre pasa al gris secundario (AA); el badge, nunca. */
+.dl-row.past .dl-name, .dl-row.cancelled .dl-name { color: var(--muted); font-weight: 600; }
+.dl-row.past .type-icon, .dl-row.cancelled .type-icon, .dl-row.past .dl-icon { opacity: 0.5; }
+.dl-row.past .dl-time, .dl-row.cancelled .dl-time { font-weight: 400; }
 .dl-sub { font-size: 13px; color: var(--muted); }
 .appt-name { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .type-label { font-size: 13px; font-weight: 600; }
@@ -184,7 +188,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .week-day .wn { font-size: 19px; font-weight: 800; }
 .week-day .dots { display: flex; gap: 3px; height: 5px; }
 .week-day .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--mint-ink-2); }
-.week-day.past { opacity: 0.65; }
+.week-day.past .wn { color: var(--muted); }
 .week-day.today .wn { color: var(--blue); }
 .week-day.on { background: var(--brand); opacity: 1; box-shadow: none; }
 .week-day.on .wd, .week-day.on .wn { color: #FFF; }
@@ -194,7 +198,12 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .tl-time { width: 44px; flex-shrink: 0; font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 18px; }
 .tl-card { flex: 1; min-width: 0; min-height: 60px; border-radius: 18px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
 .tl-card.block { background: repeating-linear-gradient(135deg, #EEF1F3 0 8px, #E6EAED 8px 16px); color: var(--muted); font-weight: 600; font-size: 14px; box-shadow: none; }
-.tl-row.cancelled .tl-card { opacity: 0.55; }
+/* M12: pasados y cancelados se atenúan en la hora, el fondo y el ícono, nunca en el badge de estado
+   (antes una opacity general lo dejaba ilegible). Los textos siguen en AA. */
+.tl-row.past .tl-time, .tl-row.cancelled .tl-time { font-weight: 400; }
+.tl-row.past .tl-card, .tl-row.cancelled .tl-card { background: rgba(255, 255, 255, 0.5); box-shadow: 0 0 0 1px var(--line) inset; }
+.tl-row.past .tl-name, .tl-row.cancelled .tl-name { color: var(--muted); }
+.tl-row.past .type-icon, .tl-row.cancelled .type-icon { opacity: 0.5; }
 .tl-row.cancelled .tl-name { text-decoration: line-through; }
 .tl-name { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tl-sub { font-size: 13px; font-weight: 600; }

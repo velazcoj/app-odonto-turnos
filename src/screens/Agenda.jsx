@@ -8,7 +8,7 @@ import { navigate } from '../lib/router.js';
 import { typeOf, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
 import {
   todayISO, addDays, weekStart, dayShort, dayNum, monthName, capitalize, formatLong,
-  timeToMin, minToTime, durationLabel, isWorkDay,
+  timeToMin, minToTime, durationLabel, isWorkDay, hasEnded,
 } from '../lib/dates.js';
 
 const occupies = (a) => a.status !== 'cancelado';
@@ -133,7 +133,7 @@ export default function Agenda({ params }) {
             }
             const t = typeOf(a.type);
             return (
-              <div key={a.id} className={`tl-row${a.status === 'cancelado' ? ' cancelled' : ''}`}>
+              <div key={a.id} className={`tl-row${a.status === 'cancelado' ? ' cancelled' : ''}${hasEnded(a) ? ' past' : ''}`}>
                 <span className="tl-time">{a.start}</span>
                 <button className="tl-card" onClick={() => setSelId(a.id)}>
                   <TypeIcon type={a.type} size={40} variant="tint" />

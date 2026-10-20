@@ -160,6 +160,7 @@ export default function AppointmentForm({ id, params }) {
     const ms = timeToMin(f.start);
     return ms < e && ms + duration > s;
   });
+  const conflictText = conflicts.map((c) => `${c.kind === 'bloqueo' ? (c.label || 'un bloqueo') : apptName(c, patientsById)} (${c.start})`).join(', ');
   const nextAfter = (sameDay || []).filter((a) => a.id !== f.id && a.status !== 'cancelado' && timeToMin(a.start) >= timeToMin(f.start) + duration)[0];
 
   const save = async () => {
@@ -167,6 +168,9 @@ export default function AppointmentForm({ id, params }) {
     if (!isBlock && !f.patientId) { setError('Elegí un paciente.'); return; }
     if (!f.date || !f.start) { setError('Completá día y hora.'); return; }
     if (isBlock && duration <= 0) { setError('La hora de fin tiene que ser posterior al inicio.'); return; }
+    // El aviso puede quedar fuera de vista (teclado, o tocando Guardar arriba): confirmar. No se bloquea
+    // porque a veces se superpone a propósito.
+    if (conflicts.length && !window.confirm(`Se superpone con ${conflictText}. ¿Guardar igual?`)) return;
     setSaving(true);
     const base = { id: isNew ? undefined : id, date: f.date, start: f.start, duration, notes: (f.notes || '').trim() };
     // Si se reprogramó, el recordatorio y la confirmación (o el ausente/cancelado) eran del horario viejo.
@@ -261,7 +265,7 @@ export default function AppointmentForm({ id, params }) {
 
         {sameDay && (conflicts.length > 0 ? (
           <div className="hint warn">
-            Se superpone con {conflicts.map((c) => `${c.kind === 'bloqueo' ? (c.label || 'un bloqueo') : apptName(c, patientsById)} (${c.start})`).join(', ')}
+            Se superpone con {conflictText}
           </div>
         ) : (
           <div className="hint ok">

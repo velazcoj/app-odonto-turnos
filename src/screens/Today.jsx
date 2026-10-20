@@ -23,7 +23,8 @@ export default function Today() {
   const tomorrows = (list || []).filter((a) => a.date === tomorrow && active(a));
   const count = todays.filter((a) => a.kind !== 'bloqueo' && a.status !== 'cancelado').length;
   const now = nowMin();
-  const next = todays.find((a) => active(a) && timeToMin(a.start) + (a.duration || 30) > now);
+  // El que ya se marcó "Asistió" no es el próximo, aunque su horario no haya terminado.
+  const next = todays.find((a) => active(a) && a.status !== 'asistio' && timeToMin(a.start) + (a.duration || 30) > now);
   const selAppt = sel && (list || []).find((a) => a.id === sel);
 
   let when = '';

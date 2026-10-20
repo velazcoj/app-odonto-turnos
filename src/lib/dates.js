@@ -12,6 +12,8 @@ export function toISO(d) {
 }
 
 export function parseISO(s) {
+  // Un dato roto no tiene que tirar abajo la pantalla entera.
+  if (typeof s !== 'string' || !s) { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }
   const [y, m, d] = s.split('-').map(Number);
   return new Date(y, m - 1, d);
 }
@@ -66,6 +68,7 @@ export function relativeDay(s) {
 }
 
 export function timeToMin(t) {
+  if (typeof t !== 'string') return 0;
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
 }

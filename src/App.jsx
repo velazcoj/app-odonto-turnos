@@ -16,14 +16,15 @@ export default function App() {
   const [patients, setPatients] = useState(null);
   const [settings, setSettings] = useState({});
   const [settingsReady, setSettingsReady] = useState(false);
+  const [loadError, setLoadError] = useState(null);
   const route = useRoute();
 
   useEffect(() => store.onAuth(setUser), []);
 
   useEffect(() => {
     if (!user) { setPatients(null); setSettingsReady(false); return undefined; }
-    const u1 = store.watchPatients(setPatients);
-    const u2 = store.watchSettings((s) => { setSettings(s); setSettingsReady(true); });
+    const u1 = store.watchPatients(setPatients, setLoadError);
+    const u2 = store.watchSettings((s) => { setSettings(s); setSettingsReady(true); }, setLoadError);
     return () => { u1(); u2(); };
   }, [user]);
 
@@ -31,6 +32,7 @@ export default function App() {
   const ctx = useMemo(() => ({ user, patients, patientsById, settings, settingsReady }),
     [user, patients, patientsById, settings, settingsReady]);
 
+  if (loadError) throw loadError; // lo muestra el ErrorBoundary de main.jsx
   if (user === undefined) return <div className="splash" />;
   if (!user) return <Login />;
 

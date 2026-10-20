@@ -44,6 +44,8 @@ function report(err) {
   }
 }
 const send = (write) => { write.catch(report); };
+// Si una suscripción falla, Firestore la corta y no vuelve a llamar: avisar para no quedar en "Cargando…".
+const failed = (onError) => (err) => { console.error(err); onError?.(err); };
 
 export const isDemo = false;
 
@@ -54,15 +56,15 @@ export const login = (email, pw) => signInWithEmailAndPassword(auth, email.trim(
 export const logout = () => signOut(auth);
 export const resetPassword = (email) => sendPasswordResetEmail(auth, email.trim());
 
-export function watchSettings(cb) {
-  return onSnapshot(doc(db, 'users', uid()), (s) => cb(s.data()?.settings || {}), () => cb({}));
+export function watchSettings(cb, onError) {
+  return onSnapshot(doc(db, 'users', uid()), (s) => cb(s.data()?.settings || {}), failed(onError));
 }
 export async function saveSettings(settings) {
   send(setDoc(doc(db, 'users', uid()), { settings }, { merge: true }));
 }
 
-export function watchPatients(cb) {
-  return onSnapshot(patientsCol(), (s) => cb(withId(s)));
+export function watchPatients(cb, onError) {
+  return onSnapshot(patientsCol(), (s) => cb(withId(s)), failed(onError));
 }
 
 // Mantener el nombre y el teléfono actualizados en los turnos del paciente.
@@ -98,14 +100,14 @@ export async function deletePatient(id) {
   send(deleteDoc(doc(patientsCol(), id)));
 }
 
-export function watchAppointmentsRange(from, to, cb) {
+export function watchAppointmentsRange(from, to, cb, onError) {
   const q = query(apptsCol(), where('date', '>=', from), where('date', '<=', to));
-  return onSnapshot(q, (s) => cb(withId(s)));
+  return onSnapshot(q, (s) => cb(withId(s)), failed(onError));
 }
 
-export function watchPatientAppointments(patientId, cb) {
+export function watchPatientAppointments(patientId, cb, onError) {
   const q = query(apptsCol(), where('patientId', '==', patientId));
-  return onSnapshot(q, (s) => cb(withId(s)));
+  return onSnapshot(q, (s) => cb(withId(s)), failed(onError));
 }
 
 export async function getAppointment(id) {

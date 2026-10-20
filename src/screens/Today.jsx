@@ -8,7 +8,7 @@ import { useAppointments, useMinuteTick } from '../lib/hooks.js';
 import {
   todayISO, addDays, formatShort, timeToMin, nowMin, durationLabel, nextWorkDay, dayName, dayShort,
 } from '../lib/dates.js';
-import { telLink, noWaText } from '../lib/phone.js';
+import { telLink, noWaText, onWhatsAppClick } from '../lib/phone.js';
 import { apptName, typeOf, DEFAULT_SETTINGS } from '../lib/constants.js';
 
 const active = (a) => a.kind !== 'bloqueo' && a.status !== 'cancelado' && a.status !== 'ausente';
@@ -99,7 +99,7 @@ export default function Today() {
           </button>
           <div className="row gap10">
             {nextWa ? (
-              <a className="next-btn solid" target="_blank" rel="noreferrer" href={nextWa}>
+              <a className="next-btn solid" href={nextWa} onClick={onWhatsAppClick()}>
                 <Icon name="whatsapp" size={18} />WhatsApp
               </a>
             ) : <span className="next-btn disabled" aria-disabled="true"><Icon name="whatsapp" size={18} />{noWaText(nextPhone)}</span>}
@@ -168,13 +168,13 @@ export default function Today() {
                   {a.reminderSent ? (
                     // Abrir WhatsApp no garantiza que se haya mandado: tocar "Enviado" lo reabre para reenviar.
                     link ? (
-                      <a className="sent" href={link} target="_blank" rel="noreferrer" aria-label="Enviado. Tocar para reenviar">
+                      <a className="sent" href={link} onClick={onWhatsAppClick()} aria-label="Enviado. Tocar para reenviar">
                         <Icon name="check" size={16} />Enviado
                       </a>
                     ) : <span className="sent"><Icon name="check" size={16} />Enviado</span>
                   ) : link ? (
-                    <a className="btn small wa" href={link} target="_blank" rel="noreferrer"
-                      onClick={() => store.updateAppointment(a.id, { reminderSent: true })}>
+                    <a className="btn small wa" href={link}
+                      onClick={onWhatsAppClick(() => store.updateAppointment(a.id, { reminderSent: true }))}>
                       <Icon name="whatsapp" size={16} />Enviar
                     </a>
                   ) : <span className="muted small">{noWaText(patientsById[a.patientId]?.phone || a.patientPhone)}</span>}

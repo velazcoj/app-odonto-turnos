@@ -69,6 +69,37 @@ export function waLink(phone, text) {
   return n ? `https://wa.me/${n}${q}` : '';
 }
 
+// Abrir WhatsApp directo (whatsapp://send) en el teléfono, en vez de pasar por la página de wa.me. Si a los
+// ~1,5 s la app sigue a la vista (no pasó a segundo plano: WhatsApp no está instalado o iOS no lo abrió),
+// se abre wa.me de respaldo. Si la ventana pierde el foco (el cartel "¿Abrir en WhatsApp?" de iOS) se
+// considera que salió, para no abrir wa.me encima mientras ella decide. En la compu, wa.me directo.
+export function openWhatsApp(webUrl, { win = window, doc = document, ua = navigator.userAgent } = {}) {
+  const m = /^https:\/\/wa\.me\/(\d+)(?:\?text=(.*))?$/.exec(webUrl || '');
+  if (!m) return;
+  if (!/iPhone|iPad|iPod|Android/i.test(ua)) { win.open(webUrl, '_blank', 'noopener'); return; }
+  let left = false;
+  const leave = () => { left = true; };
+  const onVisibility = () => { if (doc.visibilityState === 'hidden') left = true; };
+  doc.addEventListener('visibilitychange', onVisibility);
+  win.addEventListener('pagehide', leave);
+  win.addEventListener('blur', leave);
+  win.location.href = `whatsapp://send?phone=${m[1]}${m[2] ? `&text=${m[2]}` : ''}`;
+  win.setTimeout(() => {
+    doc.removeEventListener('visibilitychange', onVisibility);
+    win.removeEventListener('pagehide', leave);
+    win.removeEventListener('blur', leave);
+    if (!left && doc.visibilityState === 'visible') win.location.href = webUrl;
+  }, 1500);
+}
+
+// onClick para un <a href={wa.me}>: abre con openWhatsApp; `before` corre en el mismo toque (p. ej. marcar
+// "Enviado"). El href queda para mantener apretado / copiar el link.
+export const onWhatsAppClick = (before) => (e) => {
+  e.preventDefault();
+  before?.();
+  openWhatsApp(e.currentTarget.href);
+};
+
 export function telLink(phone) {
   // Solo el primer número del campo, sin el interno ni un segundo número.
   const d = (parts(phone)[0]?.num || '').replace(/[^\d+]/g, '');

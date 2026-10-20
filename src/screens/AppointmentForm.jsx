@@ -8,6 +8,9 @@ import { back, navigate, currentRoute } from '../lib/router.js';
 import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
+// Fin de un bloqueo: "24:30" no es una hora válida para el input, cortar a las 23:59.
+const endTime = (min) => minToTime(Math.min(min, 23 * 60 + 59));
+
 function defaultStart(date, dayStart) {
   if (date === todayISO()) {
     const n = Math.ceil((nowMin() + 1) / 30) * 30;
@@ -112,7 +115,7 @@ export default function AppointmentForm({ id, params }) {
     notes: '',
     label: 'Almuerzo',
   }));
-  const [blockEnd, setBlockEnd] = useState(() => minToTime(timeToMin(f.start) + 60));
+  const [blockEnd, setBlockEnd] = useState(() => endTime(timeToMin(f.start) + 60));
   const [loaded, setLoaded] = useState(isNew);
   const [picker, setPicker] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -126,7 +129,7 @@ export default function AppointmentForm({ id, params }) {
       if (a) {
         orig.current = { date: a.date, start: a.start };
         setF((x) => ({ ...x, ...a }));
-        setBlockEnd(minToTime(timeToMin(a.start) + (a.duration || 30)));
+        setBlockEnd(endTime(timeToMin(a.start) + (a.duration || 30)));
       } else {
         setLoadError('Este turno ya no existe. Puede que se haya eliminado.');
       }
@@ -138,6 +141,12 @@ export default function AppointmentForm({ id, params }) {
   }, [id, isNew]);
 
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
+  // Al mover "Desde", "Hasta" acompaña manteniendo la duración (también si después pasa a bloqueo).
+  const setStart = (v) => {
+    const d = Math.max(timeToMin(blockEnd) - timeToMin(f.start), 15);
+    setBlockEnd(endTime(timeToMin(v) + d));
+    set('start', v);
+  };
   const patient = patientsById[f.patientId];
   const patientName = patient ? fullName(patient) : f.patientName;
   const isBlock = f.kind === 'bloqueo';
@@ -242,7 +251,7 @@ export default function AppointmentForm({ id, params }) {
           <label className="field"><span>Día</span>
             <input type="date" value={f.date} onChange={(e) => e.target.value && set('date', e.target.value)} /></label>
           <label className="field"><span>{isBlock ? 'Desde' : 'Hora'}</span>
-            <input type="time" step="300" value={f.start} onChange={(e) => e.target.value && set('start', e.target.value)} /></label>
+            <input type="time" step="300" value={f.start} onChange={(e) => e.target.value && setStart(e.target.value)} /></label>
           {isBlock && (
             <label className="field"><span>Hasta</span>
               <input type="time" step="300" value={blockEnd} onChange={(e) => e.target.value && setBlockEnd(e.target.value)} /></label>

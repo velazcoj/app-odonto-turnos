@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { TopBar, BackLink, Avatar, StatusBadge, TypeLabel, SectionTitle, Empty } from '../components/ui.jsx';
+import { TopBar, BackLink, Avatar, StatusBadge, TypeLabel, TypeIcon, Empty } from '../components/ui.jsx';
 import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
 import { usePatientAppointments, useMinuteTick } from '../lib/hooks.js';
@@ -19,6 +19,7 @@ export const justCreated = new Set();
 function ApptRow({ ap, today, onSelect }) {
   return (
     <button className="list-row" onClick={() => onSelect(ap.id)}>
+      <TypeIcon type={ap.type} size={40} variant="tint" />
       <span className="col gap2 grow">
         <span className="appt-name">{ap.date === today ? 'Hoy' : formatShort(ap.date)} · {ap.start}</span>
         <TypeLabel type={ap.type} />
@@ -109,12 +110,12 @@ export default function PatientDetail({ id }) {
 
       {upcoming.length > 0 && (
         <>
-          <SectionTitle>Próximos turnos</SectionTitle>
+          <div className="section-head"><h2>Próximos turnos</h2></div>
           <div className="card list">{upcoming.map((ap) => <ApptRow key={ap.id} ap={ap} today={today} onSelect={setSel} />)}</div>
         </>
       )}
 
-      <SectionTitle>Turnos anteriores</SectionTitle>
+      <div className="section-head"><h2>Turnos anteriores</h2></div>
       {appts === null ? <div className="loading">Cargando…</div> : pastList.length === 0
         ? <div className="muted pad">Todavía no tiene turnos anteriores.</div>
         : <div className="card list">{pastList.slice(0, 30).map((ap) => <ApptRow key={ap.id} ap={ap} today={today} onSelect={setSel} />)}</div>}

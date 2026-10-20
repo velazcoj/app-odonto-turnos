@@ -5,9 +5,11 @@ import AppointmentSheet, { reminderLink } from '../components/AppointmentSheet.j
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments, useMinuteTick } from '../lib/hooks.js';
-import { todayISO, addDays, formatLong, timeToMin, minToTime, nowMin, durationLabel } from '../lib/dates.js';
+import {
+  todayISO, addDays, formatLong, timeToMin, minToTime, nowMin, durationLabel, nextWorkDay, dayName, dayShort,
+} from '../lib/dates.js';
 import { telLink } from '../lib/phone.js';
-import { apptName } from '../lib/constants.js';
+import { apptName, DEFAULT_SETTINGS } from '../lib/constants.js';
 
 const active = (a) => a.kind !== 'bloqueo' && a.status !== 'cancelado' && a.status !== 'ausente';
 
@@ -16,11 +18,17 @@ export default function Today() {
   const { patientsById, settings } = useApp();
   const today = todayISO();
   const tomorrow = addDays(today, 1);
-  const list = useAppointments(today, tomorrow);
+  // Recordatorios para el próximo día que atiende (un viernes, los del lunes). Si en el medio hay un
+  // día que no atiende pero con turnos (un sábado excepcional), también entran.
+  const remDate = nextWorkDay(today, settings.workDays || DEFAULT_SETTINGS.workDays);
+  const list = useAppointments(today, remDate);
   const [sel, setSel] = useState(null);
 
   const todays = (list || []).filter((a) => a.date === today);
-  const tomorrows = (list || []).filter((a) => a.date === tomorrow && active(a));
+  const tomorrows = (list || []).filter((a) => a.date > today && active(a));
+  const severalDays = tomorrows.some((a) => a.date !== remDate);
+  const remTitle = remDate === tomorrow && !severalDays ? 'Recordatorios para mañana'
+    : `Recordatorios ${severalDays ? 'hasta' : 'para'} el ${dayName(remDate).toLowerCase()}`;
   const count = todays.filter((a) => a.kind !== 'bloqueo' && a.status !== 'cancelado').length;
   const now = nowMin();
   // El que ya se marcó "Asistió" no es el próximo, aunque su horario no haya terminado.
@@ -107,7 +115,7 @@ export default function Today() {
 
       {tomorrows.length > 0 && (
         <>
-          <SectionTitle>Recordatorios para mañana</SectionTitle>
+          <SectionTitle>{remTitle}</SectionTitle>
           <div className="card list">
             {tomorrows.map((a) => {
               const link = reminderLink(a, patientsById[a.patientId], settings);
@@ -115,7 +123,7 @@ export default function Today() {
                 <div key={a.id} className="list-row">
                   <div className="col gap3 grow">
                     <span className="appt-name">{apptName(a, patientsById)}</span>
-                    <span className="muted small">{a.start} · <TypeLabel type={a.type} /></span>
+                    <span className="muted small">{severalDays && `${dayShort(a.date)} `}{a.start} · <TypeLabel type={a.type} /></span>
                   </div>
                   {a.reminderSent ? (
                     // Abrir WhatsApp no garantiza que se haya mandado: tocar "Enviado" lo reabre para reenviar.

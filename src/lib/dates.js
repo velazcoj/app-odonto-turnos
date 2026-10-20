@@ -29,6 +29,15 @@ export function addDays(s, n) {
 // ¿Atiende ese día? workDays: [0..6] como Date.getDay().
 export const isWorkDay = (s, workDays) => workDays.includes(parseISO(s).getDay());
 
+// Próximo día que atiende después de s (si no atiende ningún día, mañana).
+export function nextWorkDay(s, workDays) {
+  for (let i = 1; i <= 7; i++) {
+    const d = addDays(s, i);
+    if (isWorkDay(d, workDays)) return d;
+  }
+  return addDays(s, 1);
+}
+
 export function weekStart(s) {
   const d = parseISO(s);
   const dow = (d.getDay() + 6) % 7; // lunes = 0

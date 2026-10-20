@@ -6,19 +6,28 @@ const SEPARATORS = /\s*(?:[/,;]|\s[oóy]\s|\b(?:interno|int|ext)[.:]?(?=[\s\d]|$
 // Sin el texto de alrededor: "cel: +54…" → "+54…", "… después de las 20" / "… (18 hs)" → solo el número
 // (si no, esos dígitos se sumaban y podían armar el número válido de otra persona).
 const cleanPart = (p) => p.replace(/^[^\d+]+/, '').replace(/\s*\p{L}.*$/u, '').replace(/\s*\([^)]*$/, '');
+// Cada parte: { raw: texto original (con "Cel", "15"…), num: solo el número }.
 function parts(phone) {
-  const pieces = String(phone || '').split(SEPARATORS).map(cleanPart).filter((p) => /\d/.test(p));
+  const pieces = String(phone || '').split(SEPARATORS).map((raw) => ({ raw, num: cleanPart(raw) })).filter((p) => /\d/.test(p.num));
   const out = [];
   for (let i = 0; i < pieces.length; i++) {
-    let p = pieces[i];
+    let { raw, num } = pieces[i];
     // Una "/" dentro de un mismo número ("11/5555-0142", "4444/1234"): unir con lo que sigue si el
     // pedazo es demasiado corto para ser un número, o si solo así queda un número válido.
     const short = (x) => x.replace(/\D/g, '').length < 6;
-    while (!waOne(p) && i + 1 < pieces.length && (short(p) || waOne(`${p} ${pieces[i + 1]}`))) p += ` ${pieces[++i]}`;
-    out.push(p);
+    while (!waOne(num) && i + 1 < pieces.length && (short(num) || waOne(`${num} ${pieces[i + 1].num}`))) {
+      i++;
+      raw += ` ${pieces[i].raw}`;
+      num += ` ${pieces[i].num}`;
+    }
+    out.push({ raw, num });
   }
   return out;
 }
+
+// Marcas de celular, para elegir esa parte cuando hay "fijo / celular" (un fijo con característica
+// también arma un link válido, pero WhatsApp no lo tiene).
+const MOBILE = /cel|m[oó]vil|wsp|whats|^\D*(\+|00)?\s*54\s*9|(^|[\s-])15[\s-]/i;
 
 function waOne(s) {
   let d = s.replace(/\D/g, '');
@@ -47,11 +56,8 @@ function waOne(s) {
 }
 
 export function waNumber(phone) {
-  for (const p of parts(phone)) {
-    const n = waOne(p);
-    if (n) return n;
-  }
-  return '';
+  const valid = parts(phone).map((p) => ({ ...p, wa: waOne(p.num) })).filter((p) => p.wa);
+  return (valid.find((p) => MOBILE.test(p.raw)) || valid[0])?.wa || '';
 }
 
 export function waLink(phone, text) {
@@ -62,6 +68,6 @@ export function waLink(phone, text) {
 
 export function telLink(phone) {
   // Solo el primer número del campo, sin el interno ni un segundo número.
-  const d = (parts(phone)[0] || '').replace(/[^\d+]/g, '');
+  const d = (parts(phone)[0]?.num || '').replace(/[^\d+]/g, '');
   return d ? `tel:${d}` : '';
 }

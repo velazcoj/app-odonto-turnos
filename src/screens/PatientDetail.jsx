@@ -5,7 +5,7 @@ import AppointmentSheet from '../components/AppointmentSheet.jsx';
 import { useApp } from '../context.js';
 import { usePatientAppointments, useMinuteTick } from '../lib/hooks.js';
 import { back, navigate } from '../lib/router.js';
-import { fullName } from '../lib/constants.js';
+import { displayName } from '../lib/constants.js';
 import { formatDMY, age, todayISO, monthYear, formatShort, hasEnded } from '../lib/dates.js';
 import { waLink, telLink, noWaText, onWhatsAppClick } from '../lib/phone.js';
 
@@ -79,7 +79,7 @@ export default function PatientDetail({ id }) {
 
       <div className="profile">
         <Avatar patient={p} size={76} />
-        <div className="profile-name">{fullName(p)}</div>
+        <div className="profile-name">{displayName(p)}</div>
         <div className="muted">
           {[since && `Paciente desde ${monthYear(since)}`, visits ? `${visits} ${visits === 1 ? 'visita' : 'visitas'}` : null].filter(Boolean).join(' · ')}
         </div>

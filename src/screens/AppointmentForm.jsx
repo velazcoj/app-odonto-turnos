@@ -5,7 +5,7 @@ import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { back, navigate, currentRoute } from '../lib/router.js';
-import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, norm, apptName, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
+import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, displayName, norm, apptName, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
 // Fin de un bloqueo: "24:30" no es una hora válida para el input, cortar a las 23:59.
@@ -80,7 +80,7 @@ function PatientPicker({ open, onClose, onPick }) {
               <button key={p.id} className="list-row link" onClick={() => { setQ(''); onPick(p); }}>
                 <Avatar patient={p} size={38} />
                 <span className="col gap2 grow">
-                  <span className="appt-name">{p.lastName}, {p.firstName}</span>
+                  <span className="appt-name">{displayName(p)}</span>
                   {p.phone && <span className="muted small">{p.phone}</span>}
                 </span>
               </button>
@@ -246,7 +246,7 @@ export default function AppointmentForm({ id, params }) {
               {f.patientId ? (
                 <>
                   <Avatar patient={patient || { firstName: patientName, id: f.patientId }} size={38} />
-                  <span className="appt-name grow">{patientName}</span>
+                  <span className="appt-name grow">{displayName(patient) || patientName}</span>
                   <span className="link-strong">Cambiar</span>
                 </>
               ) : (

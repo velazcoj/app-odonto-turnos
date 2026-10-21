@@ -7,7 +7,7 @@ import { back, navigate } from '../lib/router.js';
 import { usePatientAppointments } from '../lib/hooks.js';
 import { justCreated } from './PatientDetail.jsx';
 import { hasEnded } from '../lib/dates.js';
-import { INSURANCES, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
+import { INSURANCES, findDuplicate, duplicateQuestion, cap, displayName } from '../lib/constants.js';
 
 const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
 
@@ -65,7 +65,7 @@ function PatientFields({ id, existing }) {
   };
 
   const remove = async () => {
-    if (!window.confirm(`¿Eliminar a ${existing.firstName} ${existing.lastName}?`)) return;
+    if (!window.confirm(`¿Eliminar a ${displayName(existing)}?`)) return;
     // Los turnos que ya pasaron quedan como historial; los próximos, si ella quiere, se borran también.
     const upcoming = (appts || []).filter((a) => !hasEnded(a));
     const n = upcoming.length;

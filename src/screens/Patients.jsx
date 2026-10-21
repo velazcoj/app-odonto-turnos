@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { TabBar, Avatar, Empty } from '../components/ui.jsx';
 import { useApp } from '../context.js';
-import { norm, fullName } from '../lib/constants.js';
+import { norm, displayName } from '../lib/constants.js';
 import { parseISO } from '../lib/dates.js';
 import { savedScroll } from '../lib/router.js';
 
@@ -111,11 +111,11 @@ export default function Patients() {
               <a key={p.id} className="list-row link" href={`#/paciente/${p.id}`}>
                 <Avatar patient={p} />
                 <span className="col gap2 grow">
-                  <span className="appt-name">{p.lastName}, {p.firstName}</span>
+                  <span className="appt-name">{displayName(p)}</span>
                   <span className="muted small">
                     {filter === 'cumple' && p.birthDate
                       ? `Cumple el ${parseISO(p.birthDate).getDate()}`
-                      : [p.insurance, p.phone].filter(Boolean).join(' · ') || fullName(p)}
+                      : [p.insurance, p.phone].filter(Boolean).join(' · ') || displayName(p)}
                   </span>
                 </span>
                 <Icon name="chevronRight" size={18} stroke={2.2} style={{ color: '#9AA4AD' }} />

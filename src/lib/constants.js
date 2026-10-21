@@ -48,9 +48,12 @@ export const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(
 
 // "Lucía Fernández" a partir del paciente
 export const fullName = (p) => (p ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '');
+
+// Cómo se muestra un paciente en toda la app: "Apellido, Nombre" ("Emategui, Elsa"), como en la lista.
+export const displayName = (p) => (p ? [p.lastName, p.firstName].map((s) => (s || '').trim()).filter(Boolean).join(', ') : '');
 // Nombre a mostrar en un turno: el del paciente actual; el guardado en el turno queda de respaldo
 // (paciente borrado, o turnos que no llegaron a actualizarse después de editarlo).
-export const apptName = (a, patientsById) => fullName(patientsById?.[a.patientId]) || a.patientName || '';
+export const apptName = (a, patientsById) => displayName(patientsById?.[a.patientId]) || a.patientName || '';
 export const initials = (p) => `${(p?.firstName || '?')[0] || ''}${(p?.lastName || '')[0] || ''}`.toUpperCase();
 
 // Para buscar sin importar tildes ni mayúsculas
@@ -66,4 +69,4 @@ export function findDuplicate(patients, p) {
   return (patients || []).find((x) => nameKey(x) === k || (dni && digits(x.dni) === dni));
 }
 export const duplicateQuestion = (d) =>
-  `Ya tenés a ${fullName(d)}${d.phone ? ` (${d.phone})` : ''}. ¿Crear otro paciente igual?`;
+  `Ya tenés a ${displayName(d)}${d.phone ? ` (${d.phone})` : ''}. ¿Crear otro paciente igual?`;

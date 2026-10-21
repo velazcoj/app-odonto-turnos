@@ -3,14 +3,14 @@ import { Sheet, TypeLabel, TypeIcon } from './ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { navigate } from '../lib/router.js';
-import { STATUSES, fillTemplate, DEFAULT_SETTINGS, apptName } from '../lib/constants.js';
+import { STATUSES, fillTemplate, DEFAULT_SETTINGS, apptName, firstNameOf } from '../lib/constants.js';
 import { formatLong, relativeDay, timeToMin, minToTime, durationLabel } from '../lib/dates.js';
 import { waLink, telLink, noWaText, onWhatsAppClick } from '../lib/phone.js';
 
 export function reminderLink(appt, patient, settings) {
   const phone = patient?.phone || appt.patientPhone;
   const text = fillTemplate(settings?.reminderTemplate || DEFAULT_SETTINGS.reminderTemplate, {
-    nombre: patient?.firstName || (appt.patientName || '').split(' ')[0],
+    nombre: patient?.firstName || firstNameOf(appt.patientName), // solo el nombre de pila
     dia: relativeDay(appt.date),
     hora: appt.start,
   });

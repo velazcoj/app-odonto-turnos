@@ -46,14 +46,18 @@ export function fillTemplate(tpl, { nombre, dia, hora }) {
 // Primera letra de cada palabra en mayúscula ("maría josé" → "María José"); el resto queda como se escribió.
 export const cap = (s) => s.replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1));
 
-// "Lucía Fernández" a partir del paciente
-export const fullName = (p) => (p ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '');
-
 // Cómo se muestra un paciente en toda la app: "Apellido, Nombre" ("Emategui, Elsa"), como en la lista.
 export const displayName = (p) => (p ? [p.lastName, p.firstName].map((s) => (s || '').trim()).filter(Boolean).join(', ') : '');
 // Nombre a mostrar en un turno: el del paciente actual; el guardado en el turno queda de respaldo
 // (paciente borrado, o turnos que no llegaron a actualizarse después de editarlo).
 export const apptName = (a, patientsById) => displayName(patientsById?.[a.patientId]) || a.patientName || '';
+// Nombre de pila a partir del nombre guardado en un turno (respaldo si el paciente ya no existe):
+// "Emategui, Elsa" → "Elsa" (formato actual) y "Elsa Emategui" → "Elsa" (turnos guardados antes).
+export const firstNameOf = (patientName) => {
+  const s = String(patientName || '').trim();
+  return (s.includes(',') ? s.slice(s.indexOf(',') + 1).trim() : s).split(/\s+/)[0] || '';
+};
+
 // Iniciales del avatar, primero la del apellido ("Fernández, Lucía" → "FL").
 export const initials = (p) => `${(p?.lastName || p?.firstName || '?')[0] || ''}${p?.lastName ? (p?.firstName || '')[0] || '' : ''}`.toUpperCase();
 

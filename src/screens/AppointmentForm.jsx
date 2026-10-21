@@ -5,7 +5,7 @@ import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { useAppointments } from '../lib/hooks.js';
 import { back, navigate, currentRoute } from '../lib/router.js';
-import { TYPES, DURATIONS, DEFAULT_SETTINGS, fullName, displayName, norm, apptName, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
+import { TYPES, DURATIONS, DEFAULT_SETTINGS, displayName, norm, apptName, findDuplicate, duplicateQuestion, cap } from '../lib/constants.js';
 import { todayISO, timeToMin, minToTime, nowMin, durationLabel, formatLong } from '../lib/dates.js';
 
 // Fin de un bloqueo: "24:30" no es una hora válida para el input, cortar a las 23:59.
@@ -162,7 +162,7 @@ export default function AppointmentForm({ id, params }) {
     set('start', v);
   };
   const patient = patientsById[f.patientId];
-  const patientName = patient ? fullName(patient) : f.patientName;
+  const patientName = patient ? displayName(patient) : f.patientName;
   const isBlock = f.kind === 'bloqueo';
   const duration = isBlock ? Math.max(timeToMin(blockEnd) - timeToMin(f.start), 0) : f.duration;
 
@@ -246,7 +246,7 @@ export default function AppointmentForm({ id, params }) {
               {f.patientId ? (
                 <>
                   <Avatar patient={patient || { firstName: patientName, id: f.patientId }} size={38} />
-                  <span className="appt-name grow">{displayName(patient) || patientName}</span>
+                  <span className="appt-name grow">{patientName}</span>
                   <span className="link-strong">Cambiar</span>
                 </>
               ) : (
@@ -327,7 +327,7 @@ export default function AppointmentForm({ id, params }) {
       </div>
 
       <PatientPicker open={picker} onClose={() => setPicker(false)}
-        onPick={(p) => { setF((x) => ({ ...x, patientId: p.id, patientName: fullName(p), patientPhone: p.phone || '' })); setPicker(false); }} />
+        onPick={(p) => { setF((x) => ({ ...x, patientId: p.id, patientName: displayName(p), patientPhone: p.phone || '' })); setPicker(false); }} />
     </div>
   );
 }

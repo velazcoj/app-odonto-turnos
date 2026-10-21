@@ -1,6 +1,7 @@
 // Modo demo: mismos métodos que firebase.js, pero guardando en localStorage.
 // Sirve para probar la app sin Firebase. No usar para datos reales.
 import { todayISO, addDays } from '../lib/dates.js';
+import { displayName } from '../lib/constants.js';
 
 const KEY = 'turnos-demo-v1';
 const listeners = new Set();
@@ -19,7 +20,7 @@ function seed() {
     P('p5', 'Valentina', 'Ruiz', '11 5555-0123', 'IOMA', '1995-' + t.slice(5, 7) + '-28'),
     P('p6', 'Ana', 'González', '11 5555-0166', 'Medifé', '1969-09-12'),
   ];
-  const name = (id) => { const p = patients.find((x) => x.id === id); return `${p.firstName} ${p.lastName}`; };
+  const name = (id) => displayName(patients.find((x) => x.id === id));
   const phone = (id) => patients.find((x) => x.id === id).phone;
   let n = 0;
   const A = (date, start, duration, type, status, patientId) => ({
@@ -77,7 +78,7 @@ export const watchPatients = (cb) => sub(() => cb(st().patients.map((p) => ({ ..
 export async function savePatient(p) {
   if (p.id) {
     st().patients = st().patients.map((x) => (x.id === p.id ? { ...x, ...p } : x));
-    const name = `${p.firstName} ${p.lastName}`.trim();
+    const name = displayName(p);
     st().appointments = st().appointments.map((a) =>
       a.patientId === p.id ? { ...a, patientName: name, patientPhone: p.phone || '' } : a);
     commit();

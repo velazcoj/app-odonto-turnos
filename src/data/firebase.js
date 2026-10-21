@@ -9,6 +9,7 @@ import {
   writeBatch, serverTimestamp,
 } from 'firebase/firestore';
 import { firebaseConfig } from '../firebase-config.js';
+import { displayName } from '../lib/constants.js';
 
 // Solo se inicializa si hay configuración (si no, la app usa el modo demo).
 let auth;
@@ -67,9 +68,9 @@ export function watchPatients(cb, onError) {
   return onSnapshot(patientsCol(), (s) => cb(withId(s)), failed(onError));
 }
 
-// Mantener el nombre y el teléfono actualizados en los turnos del paciente.
+// Mantener el nombre ("Apellido, Nombre") y el teléfono actualizados en los turnos del paciente.
 async function syncAppointments(p) {
-  const name = `${p.firstName} ${p.lastName}`.trim();
+  const name = displayName(p);
   const phone = p.phone || '';
   const appts = await getDocs(query(apptsCol(), where('patientId', '==', p.id)));
   const batch = writeBatch(db);

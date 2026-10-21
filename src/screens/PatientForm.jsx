@@ -38,7 +38,7 @@ function PatientFields({ id, existing }) {
 
   const save = async (e) => {
     e.preventDefault();
-    if (!f.firstName.trim() || !f.lastName.trim()) { setError('Completá nombre y apellido.'); return; }
+    if (!f.firstName.trim() || !f.lastName.trim()) { setError('Completá apellido y nombre.'); return; }
     const dup = !id && findDuplicate(patients, f);
     if (dup && !window.confirm(duplicateQuestion(dup))) return;
     setSaving(true);
@@ -86,10 +86,10 @@ function PatientFields({ id, existing }) {
 
       <div className="form">
         <div className="field-row">
-          <label className="field"><span>Nombre *</span>
-            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoCapitalize="words" autoFocus={!id} /></label>
           <label className="field"><span>Apellido *</span>
-            <input value={f.lastName} onChange={set('lastName')} autoComplete="off" autoCapitalize="words" /></label>
+            <input value={f.lastName} onChange={set('lastName')} autoComplete="off" autoCapitalize="words" autoFocus={!id} /></label>
+          <label className="field"><span>Nombre *</span>
+            <input value={f.firstName} onChange={set('firstName')} autoComplete="off" autoCapitalize="words" /></label>
         </div>
         <label className="field"><span>Celular</span>
           <input type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} placeholder="11 5555 0142" />

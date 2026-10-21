@@ -39,8 +39,9 @@ function PatientPicker({ open, onClose, onPick }) {
   }, [patients, q]);
 
   const startCreate = () => {
-    const parts = q.trim().split(/\s+/);
-    setNp({ firstName: parts[0] ? parts[0][0].toUpperCase() + parts[0].slice(1) : '', lastName: parts.slice(1).map((w) => w[0].toUpperCase() + w.slice(1)).join(' '), phone: '' });
+    // Lo buscado se lee como "Apellido Nombre": la primera palabra es el apellido y el resto, el nombre.
+    const [last = '', ...rest] = q.trim().split(/\s+/);
+    setNp({ lastName: last ? cap(last) : '', firstName: rest.length ? cap(rest.join(' ')) : '', phone: '' });
     setCreating(true);
   };
 
@@ -91,10 +92,10 @@ function PatientPicker({ open, onClose, onPick }) {
         <div className="form tight">
           <div className="sheet-title">Nuevo paciente</div>
           <div className="field-row">
-            <label className="field"><span>Nombre</span>
-              <input value={np.firstName} onChange={(e) => setNp({ ...np, firstName: e.target.value })} autoCapitalize="words" autoFocus /></label>
             <label className="field"><span>Apellido</span>
-              <input value={np.lastName} onChange={(e) => setNp({ ...np, lastName: e.target.value })} autoCapitalize="words" /></label>
+              <input value={np.lastName} onChange={(e) => setNp({ ...np, lastName: e.target.value })} autoCapitalize="words" autoFocus /></label>
+            <label className="field"><span>Nombre</span>
+              <input value={np.firstName} onChange={(e) => setNp({ ...np, firstName: e.target.value })} autoCapitalize="words" /></label>
           </div>
           <label className="field"><span>Celular</span>
             <input type="tel" inputMode="tel" value={np.phone} onChange={(e) => setNp({ ...np, phone: e.target.value })} placeholder="11 5555 0142" />

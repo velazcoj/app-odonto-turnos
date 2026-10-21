@@ -1,7 +1,7 @@
 // Copia de seguridad: un JSON con todo (para restaurar con un script si hiciera falta) y dos CSV para
 // abrir en Excel o Numbers. Sin restauración desde la app.
 import { toISO } from './dates.js';
-import { typeOf, statusOf } from './constants.js';
+import { typeOf, statusOf, apptName } from './constants.js';
 
 // Timestamps de Firestore (y los números del modo demo) → texto ISO.
 const iso = (v) => (v?.toDate ? v.toDate().toISOString() : typeof v === 'number' ? new Date(v).toISOString() : v);
@@ -17,6 +17,7 @@ const csv = (rows) => `﻿${rows.map((r) => r.map(cell).join(';')).join('\r\n')}
 export function buildBackup({ patients, appointments, settings }, now = new Date()) {
   const stamp = toISO(now);
   const byName = [...patients].sort((a, b) => `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`, 'es'));
+  const byId = Object.fromEntries(patients.map((p) => [p.id, p]));
   const byDate = [...appointments].sort((a, b) => `${a.date} ${a.start}`.localeCompare(`${b.date} ${b.start}`));
 
   const json = JSON.stringify({
@@ -32,7 +33,8 @@ export function buildBackup({ patients, appointments, settings }, now = new Date
     ['Fecha', 'Hora', 'Duración (min)', 'Tipo', 'Paciente', 'Teléfono', 'Motivo', 'Estado', 'Recordatorio enviado', 'Nota'],
     ...byDate.map((a) => (a.kind === 'bloqueo'
       ? [a.date, a.start, a.duration, 'Bloqueo', a.label, '', '', '', '', a.notes]
-      : [a.date, a.start, a.duration, 'Turno', a.patientName, a.patientPhone, typeOf(a.type).label, statusOf(a.status).label,
+      // Paciente: el nombre actual ("Apellido, Nombre"); el guardado en el turno, si el paciente ya no existe.
+      : [a.date, a.start, a.duration, 'Turno', apptName(a, byId), a.patientPhone, typeOf(a.type).label, statusOf(a.status).label,
         a.reminderSent ? 'Sí' : 'No', a.notes])),
   ]);
 

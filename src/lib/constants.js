@@ -54,7 +54,8 @@ export const displayName = (p) => (p ? [p.lastName, p.firstName].map((s) => (s |
 // Nombre a mostrar en un turno: el del paciente actual; el guardado en el turno queda de respaldo
 // (paciente borrado, o turnos que no llegaron a actualizarse después de editarlo).
 export const apptName = (a, patientsById) => displayName(patientsById?.[a.patientId]) || a.patientName || '';
-export const initials = (p) => `${(p?.firstName || '?')[0] || ''}${(p?.lastName || '')[0] || ''}`.toUpperCase();
+// Iniciales del avatar, primero la del apellido ("Fernández, Lucía" → "FL").
+export const initials = (p) => `${(p?.lastName || p?.firstName || '?')[0] || ''}${p?.lastName ? (p?.firstName || '')[0] || '' : ''}`.toUpperCase();
 
 // Para buscar sin importar tildes ni mayúsculas
 export const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();

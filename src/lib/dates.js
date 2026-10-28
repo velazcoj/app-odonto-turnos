@@ -79,6 +79,20 @@ export function relativeDay(s) {
   return `el ${DIAS[d.getDay()].toLowerCase()} ${d.getDate()}/${d.getMonth() + 1}`;
 }
 
+// Hora escrita a mano → "HH:MM", o null si no es una hora válida. Acepta "1530", "15:30", "15.30",
+// "15h30", "930" (9:30), "9" y "15" (en punto). Con separador, los minutos van con dos dígitos.
+export function parseTime(s) {
+  const t = String(s || '').trim().replace(/\s+/g, '');
+  let h;
+  let m = 0;
+  let r = /^(\d{1,2})[:.,hH](\d{2})$/.exec(t);
+  if (r) { h = +r[1]; m = +r[2]; } else if ((r = /^(\d{1,2})[hH:.]?$/.exec(t))) { h = +r[1]; } else if (/^\d{3,4}$/.test(t)) {
+    h = +t.slice(0, t.length - 2); m = +t.slice(-2);
+  } else return null;
+  if (h > 23 || m > 59) return null;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
 export function timeToMin(t) {
   if (typeof t !== 'string') return 0;
   const [h, m] = t.split(':').map(Number);

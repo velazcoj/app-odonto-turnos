@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TopBar, SectionTitle, TabBar } from '../components/ui.jsx';
 import Icon from '../components/Icon.jsx';
+import TimeField from '../components/TimeField.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
 import { DEFAULT_SETTINGS, WEEKDAYS, fillTemplate } from '../lib/constants.js';
@@ -81,13 +82,19 @@ function SettingsForm() {
   const { settings, user } = useApp();
   const [f, setF] = useState(() => ({ ...DEFAULT_SETTINGS, ...settings }));
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+  const [badTime, setBadTime] = useState({});
   const set = (k) => (e) => { setSaved(false); setF((x) => ({ ...x, [k]: e.target.value })); };
+  const setTime = (k) => (v) => { setSaved(false); setF((x) => ({ ...x, [k]: v })); };
+  const validity = (k) => (ok) => { if (!ok) setSaved(false); setBadTime((b) => (b[k] === !ok ? b : { ...b, [k]: !ok })); };
   const toggleDay = (d) => {
     setSaved(false);
     setF((x) => ({ ...x, workDays: x.workDays.includes(d) ? x.workDays.filter((w) => w !== d) : [...x.workDays, d].sort() }));
   };
 
   const save = async () => {
+    setError('');
+    if (badTime.dayStart || badTime.dayEnd) { setError('Revisá el horario de atención: escribilo como 09:00 o 900.'); return; }
     await store.saveSettings({
       displayName: (f.displayName || '').trim() || DEFAULT_SETTINGS.displayName,
       dayStart: f.dayStart, dayEnd: f.dayEnd, workDays: f.workDays, reminderTemplate: f.reminderTemplate,
@@ -106,8 +113,8 @@ function SettingsForm() {
         <SectionTitle>Horario de atención</SectionTitle>
         <div className="muted small">Se usa para mostrar los huecos libres en la agenda.</div>
         <div className="field-row">
-          <label className="field"><span>Desde</span><input type="time" step="900" value={f.dayStart} onChange={set('dayStart')} /></label>
-          <label className="field"><span>Hasta</span><input type="time" step="900" value={f.dayEnd} onChange={set('dayEnd')} /></label>
+          <TimeField label="Desde" value={f.dayStart} onChange={setTime('dayStart')} onValidity={validity('dayStart')} />
+          <TimeField label="Hasta" value={f.dayEnd} onChange={setTime('dayEnd')} onValidity={validity('dayEnd')} />
         </div>
         <div className="field">
           <span>Días que atendés</span>
@@ -126,6 +133,7 @@ function SettingsForm() {
         <div className="muted small">Podés usar {'{nombre}'}, {'{dia}'} y {'{hora}'}. Ejemplo:</div>
         <div className="bubble">{fillTemplate(f.reminderTemplate, { nombre: 'Lucía', dia: 'mañana', hora: '15:00' })}</div>
 
+        {error && <div className="error" role="alert">{error}</div>}
         <button className="btn primary block big" onClick={save} aria-live="polite">{saved ? 'Guardado ✓' : 'Guardar ajustes'}</button>
 
         <SectionTitle>Copia de seguridad</SectionTitle>

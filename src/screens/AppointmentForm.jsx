@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
+import TimeField from '../components/TimeField.jsx';
 import { TopBar, Avatar, Sheet, Empty } from '../components/ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
@@ -136,6 +137,8 @@ export default function AppointmentForm({ id, params }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [badTime, setBadTime] = useState({}); // horas escritas que no son válidas (start / end)
+  const validity = (k) => (ok) => setBadTime((b) => (b[k] === !ok ? b : { ...b, [k]: !ok }));
   const orig = useRef(null); // día, hora y paciente con que se cargó el turno, para saber si cambió
 
   useEffect(() => {
@@ -182,6 +185,7 @@ export default function AppointmentForm({ id, params }) {
     setError('');
     if (!isBlock && !f.patientId) { setError('Elegí un paciente.'); return; }
     if (!f.date || !f.start) { setError('Completá día y hora.'); return; }
+    if (badTime.start || (isBlock && badTime.end)) { setError('Revisá la hora: escribila como 15:30 o 1530.'); return; }
     if (isBlock && duration <= 0) { setError('La hora de fin tiene que ser posterior al inicio.'); return; }
     // El aviso puede quedar fuera de vista (teclado, o tocando Guardar arriba): confirmar. No se bloquea
     // porque a veces se superpone a propósito.
@@ -271,12 +275,8 @@ export default function AppointmentForm({ id, params }) {
         <div className="field-row">
           <label className="field"><span>Día</span>
             <input type="date" value={f.date} onChange={(e) => e.target.value && set('date', e.target.value)} /></label>
-          <label className="field"><span>{isBlock ? 'Desde' : 'Hora'}</span>
-            <input type="time" step="300" value={f.start} onChange={(e) => e.target.value && setStart(e.target.value)} /></label>
-          {isBlock && (
-            <label className="field"><span>Hasta</span>
-              <input type="time" step="300" value={blockEnd} onChange={(e) => e.target.value && setBlockEnd(e.target.value)} /></label>
-          )}
+          <TimeField label={isBlock ? 'Desde' : 'Hora'} value={f.start} onChange={setStart} onValidity={validity('start')} />
+          {isBlock && <TimeField label="Hasta" value={blockEnd} onChange={setBlockEnd} onValidity={validity('end')} />}
         </div>
         <div className="muted small">{formatLong(f.date)}</div>
 

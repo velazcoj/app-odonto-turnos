@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import TimeField from '../components/TimeField.jsx';
+import { freeSlots } from '../lib/slots.js';
 import { TopBar, Avatar, Sheet, Empty } from '../components/ui.jsx';
 import store from '../data/store.js';
 import { useApp } from '../context.js';
@@ -180,6 +181,12 @@ export default function AppointmentForm({ id, params }) {
   });
   const conflictText = conflicts.map((c) => `${c.kind === 'bloqueo' ? (c.label || 'un bloqueo') : apptName(c, patientsById)} (${c.start})`).join(', ');
   const nextAfter = (sameDay || []).filter((a) => a.id !== f.id && a.status !== 'cancelado' && timeToMin(a.start) >= timeToMin(f.start) + duration)[0];
+  // Horarios libres para tocar en lugar de escribir (desde ahora si es hoy; ninguno para días pasados).
+  const today = todayISO();
+  const slots = isBlock || !sameDay || f.date < today ? [] : freeSlots({
+    appts: sameDay, dayStart, dayEnd: settings.dayEnd || DEFAULT_SETTINGS.dayEnd, duration, excludeId: f.id,
+    from: f.date === today ? nowMin() : 0,
+  });
 
   const save = async () => {
     setError('');
@@ -290,6 +297,19 @@ export default function AppointmentForm({ id, params }) {
             Horario libre{nextAfter ? ` · el siguiente es a las ${nextAfter.start}` : ''}
           </div>
         ))}
+
+        {!isBlock && sameDay && f.date >= today && (
+          <div className="field">
+            <span>Horarios libres</span>
+            {slots.length ? (
+              <div className="chip-grid four">
+                {slots.map((s) => (
+                  <button key={s} className={f.start === s ? 'chip-lg on' : 'chip-lg'} aria-pressed={f.start === s} onClick={() => setStart(s)}>{s}</button>
+                ))}
+              </div>
+            ) : <div className="muted small">No quedan horarios libres ese día para {durationLabel(duration)}.</div>}
+          </div>
+        )}
 
         {!isBlock && (
           <>

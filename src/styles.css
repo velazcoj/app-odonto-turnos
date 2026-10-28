@@ -177,7 +177,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 
 /* búsqueda y chips */
 .search { margin: 16px 20px 0; height: 48px; background: var(--card); border-radius: 16px; display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--muted); box-shadow: var(--shadow); }
-.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; color: var(--ink); -webkit-appearance: none; }
+.search input { flex: 1; align-self: stretch; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; color: var(--ink); -webkit-appearance: none; }
 .search input::-webkit-search-cancel-button { display: none; }
 .search .clear { color: var(--muted); padding: 13px; margin-right: -7px; }
 .search.in-sheet { margin: 4px 0 8px; }

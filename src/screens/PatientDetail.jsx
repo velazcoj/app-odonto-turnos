@@ -65,8 +65,6 @@ export default function PatientDetail({ id }) {
     ['Teléfono', p.phone],
     ['DNI', p.dni],
     ['Nacimiento', p.birthDate && `${formatDMY(p.birthDate)}${a !== null ? ` · ${a} años` : ''}`],
-    ['Obra social', p.insurance],
-    ['N° afiliado', p.memberNumber],
     ['Email', p.email],
   ].filter(([, v]) => v);
 

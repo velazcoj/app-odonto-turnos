@@ -22,7 +22,6 @@ export const statusOf = (id) => STATUSES.find((s) => s.id === id) || STATUSES[0]
 
 export const DURATIONS = [15, 30, 45, 60, 90];
 
-export const INSURANCES = ['Particular', 'OSDE', 'Swiss Medical', 'Galeno', 'Medifé', 'Omint', 'Sancor Salud', 'IOMA', 'PAMI', 'OSECAC', 'OSDEPYM', 'Accord Salud'];
 
 // Días de la semana como los cuenta Date.getDay() (0 = domingo), en el orden de la agenda.
 export const WEEKDAYS = [[1, 'Lun'], [2, 'Mar'], [3, 'Mié'], [4, 'Jue'], [5, 'Vie'], [6, 'Sáb'], [0, 'Dom']];

@@ -26,8 +26,8 @@ export function buildBackup({ patients, appointments, settings }, now = new Date
   }, null, 2);
 
   const pacientes = csv([
-    ['Apellido', 'Nombre', 'Celular', 'DNI', 'Nacimiento', 'Obra social', 'N° afiliado', 'Email', 'Nota'],
-    ...byName.map((p) => [p.lastName, p.firstName, p.phone, p.dni, p.birthDate, p.insurance, p.memberNumber, p.email, p.notes]),
+    ['Apellido', 'Nombre', 'Celular', 'DNI', 'Nacimiento', 'Email', 'Nota'],
+    ...byName.map((p) => [p.lastName, p.firstName, p.phone, p.dni, p.birthDate, p.email, p.notes]),
   ]);
   const turnos = csv([
     ['Fecha', 'Hora', 'Duración (min)', 'Tipo', 'Paciente', 'Teléfono', 'Motivo', 'Estado', 'Recordatorio enviado', 'Nota'],

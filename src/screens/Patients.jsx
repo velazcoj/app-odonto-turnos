@@ -38,7 +38,7 @@ export default function Patients() {
       const words = nq.split(/\s+/);
       l = l.filter((p) => {
         // filter(Boolean): un campo que no existe no tiene que volverse el texto "undefined".
-        const hay = norm([p.firstName, p.lastName, p.dni, p.phone, p.insurance].filter(Boolean).join(' '));
+        const hay = norm([p.firstName, p.lastName, p.dni, p.phone].filter(Boolean).join(' '));
         const digits = (p.dni || '').replace(/\D/g, '') + ' ' + (p.phone || '').replace(/\D/g, '');
         return words.every((w) => hay.includes(w) || (/^\d+$/.test(w) && digits.includes(w)));
       });
@@ -115,7 +115,7 @@ export default function Patients() {
                   <span className="muted small">
                     {filter === 'cumple' && p.birthDate
                       ? `Cumple el ${parseISO(p.birthDate).getDate()}`
-                      : [p.insurance, p.phone].filter(Boolean).join(' · ') || displayName(p)}
+                      : p.phone || displayName(p)}
                   </span>
                 </span>
                 <Icon name="chevronRight" size={18} stroke={2.2} style={{ color: '#9AA4AD' }} />

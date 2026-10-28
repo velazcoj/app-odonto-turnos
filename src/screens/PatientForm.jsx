@@ -7,9 +7,9 @@ import { back, navigate } from '../lib/router.js';
 import { usePatientAppointments } from '../lib/hooks.js';
 import { justCreated } from './PatientDetail.jsx';
 import { hasEnded } from '../lib/dates.js';
-import { INSURANCES, findDuplicate, duplicateQuestion, cap, displayName } from '../lib/constants.js';
+import { findDuplicate, duplicateQuestion, cap, displayName } from '../lib/constants.js';
 
-const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', insurance: '', memberNumber: '', email: '', notes: '' };
+const EMPTY = { firstName: '', lastName: '', phone: '', dni: '', birthDate: '', email: '', notes: '' };
 
 export default function PatientForm({ id }) {
   const { patients, patientsById } = useApp();
@@ -44,14 +44,14 @@ function PatientFields({ id, existing }) {
     setSaving(true);
     setError('');
     try {
+      // Solo los campos del formulario: lo demás que tenga el paciente (obra social y n° de afiliado de
+      // antes, por ejemplo) queda como está, porque al editar se actualizan únicamente estos.
       const data = {
-        ...f,
         firstName: cap(f.firstName.trim()),
         lastName: cap(f.lastName.trim()),
-        phone: f.phone.trim(), dni: f.dni.trim(), email: f.email.trim(),
-        insurance: f.insurance.trim(), memberNumber: f.memberNumber.trim(), notes: f.notes.trim(),
+        phone: (f.phone || '').trim(), dni: (f.dni || '').trim(), birthDate: f.birthDate || '',
+        email: (f.email || '').trim(), notes: (f.notes || '').trim(),
       };
-      delete data.createdAt; delete data.updatedAt;
       const newId = await store.savePatient(id ? { ...data, id } : data);
       if (id) back(`/paciente/${id}`);
       else {
@@ -108,13 +108,6 @@ function PatientFields({ id, existing }) {
             <input id="pf-birth" type="date" value={f.birthDate} onChange={set('birthDate')} />
           </div>
         </div>
-        <div className="field-row">
-          <label className="field"><span>Obra social</span>
-            <input list="insurances" value={f.insurance} onChange={set('insurance')} autoComplete="off" /></label>
-          <label className="field"><span>N° afiliado</span>
-            <input value={f.memberNumber} onChange={set('memberNumber')} /></label>
-        </div>
-        <datalist id="insurances">{INSURANCES.map((i) => <option key={i} value={i} />)}</datalist>
         <label className="field"><span>Email</span>
           <input type="email" inputMode="email" value={f.email} onChange={set('email')} autoCapitalize="off" /></label>
         <label className="field"><span>Nota</span>

@@ -3,7 +3,8 @@ import Icon from '../components/Icon.jsx';
 import { TabBar, Avatar, Empty } from '../components/ui.jsx';
 import { useApp } from '../context.js';
 import { norm, displayName } from '../lib/constants.js';
-import { parseISO } from '../lib/dates.js';
+import { parseISO, todayISO, addDays, formatShort } from '../lib/dates.js';
+import { useVisits } from '../lib/visits.js';
 import { savedScroll } from '../lib/router.js';
 
 const FILTERS = [
@@ -18,8 +19,20 @@ let lastFilter = 'todos';
 
 const ts = (v) => (v?.toMillis ? v.toMillis() : typeof v === 'number' ? v : 0);
 
+// "Próx. Mié 4 nov 15:00" o "Última visita 12/03/25".
+function visitText(visits, id) {
+  const n = visits?.next[id];
+  if (n) {
+    const t = todayISO();
+    return `Próx. ${n.date === t ? 'hoy' : n.date === addDays(t, 1) ? 'mañana' : formatShort(n.date)} ${n.start}`;
+  }
+  const l = visits?.last[id];
+  return l ? `Última visita ${l.slice(8, 10)}/${l.slice(5, 7)}/${l.slice(2, 4)}` : '';
+}
+
 export default function Patients() {
   const { patients } = useApp();
+  const visits = useVisits();
   const [q, setQState] = useState(lastQ);
   const [filter, setFilterState] = useState(lastFilter);
   const setQ = (v) => { lastQ = v; setQState(v); };
@@ -115,7 +128,7 @@ export default function Patients() {
                   <span className="muted small">
                     {filter === 'cumple' && p.birthDate
                       ? `Cumple el ${parseISO(p.birthDate).getDate()}`
-                      : p.phone || displayName(p)}
+                      : [p.phone, visitText(visits, p.id)].filter(Boolean).join(' · ') || 'Sin celular'}
                   </span>
                 </span>
                 <Icon name="chevronRight" size={18} stroke={2.2} style={{ color: '#9AA4AD' }} />

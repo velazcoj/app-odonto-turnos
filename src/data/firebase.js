@@ -115,6 +115,14 @@ export function watchPatientAppointments(patientId, cb, onError) {
   return onSnapshot(q, (s) => cb(withId(s)), failed(onError));
 }
 
+// Turnos de un rango [from, to), leídos una vez (para el índice de visitas: ver lib/visits.js). Del
+// servidor: sin conexión getDocs devolvería solo lo que hay en la caché, y el índice quedaría incompleto.
+export async function getAppointmentsBetween(from, to) {
+  const q = query(apptsCol(), where('date', '>=', from), where('date', '<', to));
+  return withId(await getDocsFromServer(q));
+}
+export const userKey = () => uid();
+
 export async function getAppointment(id) {
   // Primero la caché: el turno casi siempre está ahí, y getDoc espera al servidor (con señal mala, ~10 s).
   const ref = doc(apptsCol(), id);

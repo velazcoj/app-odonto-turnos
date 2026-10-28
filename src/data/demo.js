@@ -99,6 +99,9 @@ export const watchAppointmentsRange = (from, to, cb) =>
   sub(() => cb(st().appointments.filter((a) => a.date >= from && a.date <= to).map((a) => ({ ...a }))));
 export const watchPatientAppointments = (pid, cb) =>
   sub(() => cb(st().appointments.filter((a) => a.patientId === pid).map((a) => ({ ...a }))));
+export const getAppointmentsBetween = async (from, to) =>
+  st().appointments.filter((a) => a.date >= from && a.date < to).map((a) => ({ ...a }));
+export const userKey = () => 'demo';
 export const getAppointment = async (id) => { const a = st().appointments.find((x) => x.id === id); return a ? { ...a } : null; };
 
 export async function saveAppointment(a) {

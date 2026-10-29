@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { firebaseConfig } from '../firebase-config.js';
 import { displayName } from '../lib/constants.js';
+import { patchPast } from '../lib/pastVisits.js';
 
 // Solo se inicializa si hay configuración (si no, la app usa el modo demo).
 let auth;
@@ -103,6 +104,7 @@ export async function deletePatient(id, apptIds = []) {
   batch.delete(doc(patientsCol(), id));
   apptIds.forEach((a) => batch.delete(doc(apptsCol(), a)));
   send(batch.commit());
+  apptIds.forEach((a) => patchPast(uid(), a, null));
 }
 
 export function watchAppointmentsRange(from, to, cb, onError) {
@@ -130,19 +132,23 @@ export async function getAppointment(id) {
   return s.exists() ? { id: s.id, ...s.data() } : null;
 }
 
+// Cada escritura de un turno actualiza también el resumen de visitas del teléfono (lib/pastVisits.js).
 export async function saveAppointment(a) {
   const data = clean(a);
   if (a.id) {
     send(updateDoc(doc(apptsCol(), a.id), { ...data, updatedAt: serverTimestamp() }));
+    patchPast(uid(), a.id, data);
     return a.id;
   }
   const ref = doc(apptsCol());
   send(setDoc(ref, { ...data, createdAt: serverTimestamp() }));
+  patchPast(uid(), ref.id, data);
   return ref.id;
 }
 
 export async function updateAppointment(id, partial) {
   send(updateDoc(doc(apptsCol(), id), partial));
+  patchPast(uid(), id, partial);
 }
 // Copia de seguridad: todo desde el servidor (la caché puede tener solo lo que se miró). Sin conexión, falla.
 export async function exportAll() {
@@ -154,4 +160,5 @@ export async function exportAll() {
 
 export async function deleteAppointment(id) {
   send(deleteDoc(doc(apptsCol(), id)));
+  patchPast(uid(), id, null);
 }

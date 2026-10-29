@@ -57,3 +57,23 @@ export async function loadPast(until, store) {
   return items;
 }
 
+// Un turno que se crea, edita, cambia de estado o se borra desde la app actualiza el resumen en el
+// momento. change: el turno completo, solo lo que cambió (p. ej. { status }) o null si se borró.
+export function patchPast(user, id, change) {
+  const c = user && read(user);
+  if (!c || !id) return;
+  const prev = c.items[id];
+  const it = change && {
+    kind: change.kind,
+    patientId: change.patientId !== undefined ? change.patientId : prev?.[0],
+    date: change.date !== undefined ? change.date : prev?.[1],
+    status: change.status !== undefined ? change.status : prev?.[2],
+  };
+  // Solo los turnos anteriores a la semana en vivo están en el resumen; los demás llegan solos.
+  if (it && it.kind !== 'bloqueo' && it.patientId && it.date && it.date < c.upTo) {
+    c.items[id] = [it.patientId, it.date, it.status || 'pendiente'];
+  } else if (prev) {
+    delete c.items[id];
+  } else return;
+  write(user, c);
+}

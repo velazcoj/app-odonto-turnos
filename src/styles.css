@@ -253,7 +253,7 @@ a.sent::after, button.hint::after { content: ''; position: absolute; inset: -12p
 .field input, .field textarea { width: 100%; min-height: 50px; border: 0; border-radius: 16px; background: var(--card); padding: 12px 14px; font-size: 16px; outline: none; box-shadow: 0 0 0 1px var(--line) inset; -webkit-appearance: none; appearance: none; }
 .field input:focus, .field textarea:focus { box-shadow: 0 0 0 2px var(--mint-ink-2) inset; }
 .field input[type='date'], .field input[type='time'], .field input.time-input { font-weight: 700; text-align: left; }
-.field-error { color: #991B1B; font-size: 13px; font-weight: 600; }
+.field small.field-error { color: #991B1B; font-size: 13px; font-weight: 600; }
 .field textarea { resize: vertical; }
 .field-row { display: flex; gap: 10px; }
 .segmented { display: grid; grid-template-columns: 1fr 1fr; background: #E4E9EC; border-radius: 14px; padding: 3px; }

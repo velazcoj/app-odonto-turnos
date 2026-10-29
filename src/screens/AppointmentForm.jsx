@@ -282,12 +282,19 @@ export default function AppointmentForm({ id, params }) {
         <div className="field-row">
           <label className="field"><span>Día</span>
             <input type="date" value={f.date} onChange={(e) => e.target.value && set('date', e.target.value)} /></label>
-          <TimeField label={isBlock ? 'Desde' : 'Hora'} value={f.start} onChange={setStart} onValidity={validity('start')} />
-          {isBlock && <TimeField label="Hasta" value={blockEnd} onChange={setBlockEnd} onValidity={validity('end')} />}
+          {!isBlock && <TimeField label="Hora" value={f.start} onChange={setStart} onValidity={validity('start')} />}
         </div>
+        {/* En tres columnas no entraba la fecha. */}
+        {isBlock && (
+          <div className="field-row">
+            <TimeField label="Desde" value={f.start} onChange={setStart} onValidity={validity('start')} />
+            <TimeField label="Hasta" value={blockEnd} onChange={setBlockEnd} onValidity={validity('end')} />
+          </div>
+        )}
         <div className="muted small">{formatLong(f.date)}</div>
 
-        {sameDay && (conflicts.length > 0 ? (
+        {/* Con una hora mal escrita, el aviso hablaría de la hora anterior. */}
+        {sameDay && !badTime.start && (conflicts.length > 0 ? (
           <div className="hint warn" aria-live="polite">
             Se superpone con {conflictText}
           </div>

@@ -1,16 +1,44 @@
-import { todayISO, addDays } from './dates.js';
+import { todayISO, addDays, hasEnded } from './dates.js';
 
 // Resumen de los turnos viejos guardado en el teléfono (ver lib/visits.js): se completa una vez por día
 // con los días nuevos y se rehace entero cada 30 días, para no leer de Firestore todos los turnos viejos
 // cada vez que se abre la lista de pacientes. Recibe el store para poder probarlo aparte.
 const REBUILD_DAYS = 30;
+const keyFor = (user) => `turnos-visitas-v1:${user}`;
+
+// La regla de "visita", la misma para la lista de pacientes y para "Para control": un turno que ya
+// pasó, sin contar cancelados ni ausentes.
+export const countsAsVisit = (status) => status !== 'cancelado' && status !== 'ausente';
+
+// Próximo turno y última visita de cada paciente. past: el resumen ({ id: [paciente, día, estado] });
+// live: los turnos recientes y futuros (cualquier orden).
+export function buildVisits(past, live) {
+  const next = {};
+  const last = {};
+  const visit = (pid, date, status) => {
+    if (countsAsVisit(status) && !(last[pid] >= date)) last[pid] = date;
+  };
+  Object.values(past || {}).forEach(([pid, date, status]) => visit(pid, date, status));
+  const sorted = [...(live || [])].sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
+  for (const a of sorted) {
+    if (a.kind === 'bloqueo' || !a.patientId) continue;
+    if (hasEnded(a)) visit(a.patientId, a.date, a.status);
+    else if (a.status !== 'cancelado' && !next[a.patientId]) next[a.patientId] = a;
+  }
+  return { next, last };
+}
+
+const read = (user) => {
+  try { const c = JSON.parse(localStorage.getItem(keyFor(user))); return c?.v === 1 ? c : null; } catch { return null; }
+};
+const write = (user, c) => {
+  try { localStorage.setItem(keyFor(user), JSON.stringify(c)); } catch { /* lleno */ }
+};
 
 // items: { [id del turno]: [paciente, día, estado] }, turnos anteriores a `until`.
 export async function loadPast(until, store) {
-  const key = `turnos-visitas-v1:${store.userKey()}`;
-  let c = null;
-  try { c = JSON.parse(localStorage.getItem(key)); } catch { /* sin resumen */ }
-  if (c?.v !== 1) c = null;
+  const user = store.userKey();
+  const c = read(user);
   if (c && c.upTo === until) return c.items;
   const today = todayISO();
   const full = store.isDemo || !c || c.built < addDays(today, -REBUILD_DAYS) || c.upTo > until;
@@ -25,8 +53,7 @@ export async function loadPast(until, store) {
   for (const a of docs) {
     if (a.kind !== 'bloqueo' && a.patientId) items[a.id] = [a.patientId, a.date, a.status || 'pendiente'];
   }
-  if (!store.isDemo) {
-    try { localStorage.setItem(key, JSON.stringify({ v: 1, upTo: until, built: full ? today : c.built, items })); } catch { /* lleno */ }
-  }
+  if (!store.isDemo) write(user, { v: 1, upTo: until, built: full ? today : c.built, items });
   return items;
 }
+
